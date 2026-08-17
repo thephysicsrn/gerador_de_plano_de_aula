@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap');
+
+/* MANTER SINCRONIZADO COM INDEX.CSS */
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --bg-app: #f9f8f6;
+  --bg-card: #ffffff;
+  --bg-card-subtle: #f2f0ea;
+  --bg-input: #ffffff;
+  --border-color: #e5e2d9;
+  --border-hover: #d1ccc0;
+  --border-focus: #111111;
+
+  --text-main: #111111;
+  --text-sub: #2d2d2d;
+  --text-muted: #666666;
+  --text-light: #888888;
+
+  --podia-black: #111111;
+  --podia-black-hover: #262626;
+
+  --card-blue-bg: #d0e7ec;
+  --card-blue-text: #0f3843;
+
+  --card-ochre-bg: #f5d6b2;
+  --card-ochre-text: #4a2800;
+
+  --card-purple-bg: #d8c7f0;
+  --card-purple-text: #2f1559;
+
+  --card-rose-bg: #f8c8d8;
+  --card-rose-text: #4a0d21;
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.08);
+  --shadow-paper: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
