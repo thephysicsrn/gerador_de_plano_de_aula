@@ -215,7 +215,7 @@ export default function PublicLandingPage({ onLoginSuccess, darkMode, setDarkMod
           </div>
           <div className="stat-divider"></div>
           <div className="stat-item">
-            <div className="stat-number">0 R$</div>
+            <div className="stat-number">R$ 0</div>
             <div className="stat-label">Acesso Gratuito para Professores</div>
           </div>
         </div>
