@@ -152,34 +152,36 @@ export default function PublicLandingPage({ onLoginSuccess, darkMode, setDarkMod
 
       {/* Seção: Como Funciona (Passo a Passo) */}
       <section className="section-how-it-works" id="como-funciona">
-        <div className="how-it-works-header">
-          <h2 className="how-it-works-title">Como utilizar o Edu.Plan em 4 passos simples</h2>
-          <p className="how-it-works-sub">Desenvolvido pensando na rotina real dos professores e coordenadores pedagógicos</p>
-        </div>
-
-        <div className="steps-landing-grid">
-          <div className="step-card-landing">
-            <div className="step-landing-num">1</div>
-            <h3 className="step-landing-title">Selecione a Disciplina</h3>
-            <p className="step-landing-desc">Escolha o componente curricular e a série/ano escolar.</p>
+        <div className="section-how-it-works-inner">
+          <div className="how-it-works-header">
+            <h2 className="how-it-works-title">Como utilizar o Edu.Plan em 4 passos simples</h2>
+            <p className="how-it-works-sub">Desenvolvido pensando na rotina real dos professores e coordenadores pedagógicos</p>
           </div>
 
-          <div className="step-card-landing">
-            <div className="step-landing-num">2</div>
-            <h3 className="step-landing-title">Escolha a Habilidade</h3>
-            <p className="step-landing-desc">Filtre as habilidades da BNCC ou utilize a matriz da escola.</p>
-          </div>
+          <div className="steps-landing-grid">
+            <div className="step-card-landing">
+              <div className="step-landing-num">1</div>
+              <h3 className="step-landing-title">Selecione a Disciplina</h3>
+              <p className="step-landing-desc">Escolha o componente curricular e a série/ano escolar.</p>
+            </div>
 
-          <div className="step-card-landing">
-            <div className="step-landing-num">3</div>
-            <h3 className="step-landing-title">Gere com IA</h3>
-            <p className="step-landing-desc">Clique em gerar para o DeepSeek criar a proposta didática.</p>
-          </div>
+            <div className="step-card-landing">
+              <div className="step-landing-num">2</div>
+              <h3 className="step-landing-title">Escolha a Habilidade</h3>
+              <p className="step-landing-desc">Filtre as habilidades da BNCC ou utilize a matriz da escola.</p>
+            </div>
 
-          <div className="step-card-landing">
-            <div className="step-landing-num">4</div>
-            <h3 className="step-landing-title">Baixe ou Imprima</h3>
-            <p className="step-landing-desc">Exporte para Word (.docx) ou PDF formatado imediatamente.</p>
+            <div className="step-card-landing">
+              <div className="step-landing-num">3</div>
+              <h3 className="step-landing-title">Gere com IA</h3>
+              <p className="step-landing-desc">Clique em gerar para o DeepSeek criar a proposta didática.</p>
+            </div>
+
+            <div className="step-card-landing">
+              <div className="step-landing-num">4</div>
+              <h3 className="step-landing-title">Baixe ou Imprima</h3>
+              <p className="step-landing-desc">Exporte para Word (.docx) ou PDF formatado imediatamente.</p>
+            </div>
           </div>
         </div>
       </section>
