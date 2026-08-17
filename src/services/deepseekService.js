@@ -284,3 +284,100 @@ export function generateMockPei(formData) {
     acoesIntegradasFamiliaAEE: 'Encontros mensais de alinhamento entre o professor regente, a equipe da Sala de Recursos Multifuncionais (AEE) e a família, garantindo a continuidade das estratégias e o acompanhamento do desenvolvimento do estudante.'
   };
 }
+
+/**
+ * Geração de Sequência Didática (4 a 8 Aulas Encadeadas) com IA
+ */
+export async function generateDidacticSequenceWithAI(formData, apiKey = '') {
+  try {
+    const promptSystem = `Você é um doutor em Didática e Educação Básica. Crie uma Sequência Didática Encadeada completa para a unidade temática "${formData.unidadeTematica}". Retorne um JSON válido com: { "titulo": "", "objetivoGeral": "", "aulasEncadeadas": [ { "aulaNumero": "Aula 1", "temaAula": "", "objetivoEspecifico": "", "desenvolvimento": "", "recursos": "", "avaliacaoFormacao": "" } ], "avaliacaoFinalSequencia": "", "referenciasBibliograficas": "" }`;
+    const promptUser = `Gere a sequência didática de ${formData.numeroAulas} para ${formData.disciplina} (${formData.anoSerie}) com foco em ${formData.tipoMetodologia}. Habilidades: ${formData.habilidadesBNCC?.map(h => h.code).join(', ')}`;
+    const rawResult = await callDeepSeekAPI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }], apiKey);
+    const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+    return JSON.parse(cleanJsonText);
+  } catch (e) {
+    return generateMockDidacticSequence(formData);
+  }
+}
+
+export function generateMockDidacticSequence(formData) {
+  const { disciplina, anoSerie, numeroAulas, unidadeTematica, habilidadesBNCC, tipoMetodologia } = formData;
+  return {
+    titulo: `Sequência Didática: ${unidadeTematica || 'Unidade Integrada'} — ${disciplina} (${anoSerie})`,
+    objetivoGeral: `Desenvolver a compreensão aprofundada da unidade temática ${unidadeTematica || 'proposta'}, mobilizando as habilidades da BNCC (${habilidadesBNCC?.map(h => h.code).join(', ')}) ao longo de ${numeroAulas} através de ${tipoMetodologia}.`,
+    aulasEncadeadas: [
+      {
+        aulaNumero: "Aula 1 — Problematização e Diagnóstico",
+        temaAula: `Introdução a ${unidadeTematica || 'Unidade'} e Levantamento de Hipóteses`,
+        objetivoEspecifico: `Identificar conhecimentos prévios e sensibilizar os estudantes para o tema central.`,
+        desenvolvimento: `Perguntas disparadoras, mapa mental coletivo no quadro e apresentação da pergunta investigativa do projeto.`,
+        recursos: `Quadro digital, imagens impressas e fichas de registro inicial.`,
+        avaliacaoFormacao: `Observação direta do engajamento e participação no levantamento de hipóteses.`
+      },
+      {
+        aulaNumero: "Aula 2 — Investigação e Aprofundamento Conceitual",
+        temaAula: `Exploração dos Conceitos Chave e Análise Guiada`,
+        objetivoEspecifico: `Analisar as variáveis e conceitos teóricos centrais da habilidade.`,
+        desenvolvimento: `Estudo dirigido em duplas com roteiro de análise de texto/experimento e sistematização em tabela comparativa.`,
+        recursos: `Roteiro impresso com textos curtos e esquemas conceituais.`,
+        avaliacaoFormacao: `Análise do preenchimento da tabela de sistematização pelos grupos.`
+      },
+      {
+        aulaNumero: "Aula 3 — Aplicação Prática em Equipe (Metodologia Ativa)",
+        temaAula: `Resolução de Problemas / Mão na Massa`,
+        objetivoEspecifico: `Aplicar os conceitos aprendidos na elaboração de uma solução prática ou produto parcial.`,
+        desenvolvimento: `Rotação por estações ou estação maker onde os estudantes criam um protótipo, infográfico ou maquete explicativa.`,
+        recursos: `Materiais recicláveis, cartolinas, tesoura, cola e dispositivos para pesquisa.`,
+        avaliacaoFormacao: `Feedback formativo contínuo circulando pelas equipes durante a produção.`
+      },
+      {
+        aulaNumero: "Aula 4 — Apresentação, Síntese e Avaliação Final",
+        temaAula: `Feira de Ideias e Consolidação das Aprendizagens`,
+        objetivoEspecifico: `Apresentar os resultados, argumentar fundamentos e consolidar o aprendizado final.`,
+        desenvolvimento: `Apresentação rápida das equipes (pitch de 3 min), síntese orientada pelo professor e autoavaliação final.`,
+        recursos: `Ficha de rubrica de avaliação e mural de exposições.`,
+        avaliacaoFormacao: `Avaliação sumativa e formativa por meio de rubrica com critérios claros.`
+      }
+    ],
+    avaliacaoFinalSequencia: `Avaliação global combinando a participação contínua no processo (40%), o produto prático da Aula 3 (30%) e a apresentação com síntese final (30%).`,
+    referenciasBibliograficas: `Base Nacional Comum Curricular (BNCC - MEC); Matriz Curricular Institucional; Referenciais de Metodologias Ativas.`
+  };
+}
+
+/**
+ * Geração de Relatório Pedagógico / Parecer Descritivo do Aluno com IA
+ */
+export async function generatePedagogicalReportWithAI(formData, apiKey = '') {
+  try {
+    const promptSystem = `Você é um coordenador pedagógico e especialista em Pareceres Descritivos. Crie um Relatório Pedagógico Individual formal, empático e construtivo. Retorne um JSON válido com: { "tituloRelatorio": "", "introducaoContexto": "", "desenvolvimentoCognitivo": "", "desenvolvimentoSocioemocional": "", "pontosFortesDestacados": [], "desafiosECombinados": [], "recomendacoesPedagógicas": "", "consideracoesFinais": "" }`;
+    const promptUser = `Gere o relatório de ${formData.nomeAluno} (${formData.anoSerie} - ${formData.disciplina}). Período: ${formData.periodo}. Pontos Fortes: ${formData.pontosFortes}. Desafios: ${formData.desafiosAprendizagem}. Comportamento: ${formData.comportamentoSocioemocional}. Recomendações: ${formData.recomendacoesFamilia}.`;
+    const rawResult = await callDeepSeekAPI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }], apiKey);
+    const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+    return JSON.parse(cleanJsonText);
+  } catch (e) {
+    return generateMockPedagogicalReport(formData);
+  }
+}
+
+export function generateMockPedagogicalReport(formData) {
+  const { nomeAluno, anoSerie, disciplina, periodo, tipoRelatorio, pontosFortes, desafiosAprendizagem, comportamentoSocioemocional, recomendacoesFamilia } = formData;
+  const nome = nomeAluno || 'o(a) estudante';
+  return {
+    tituloRelatorio: `${tipoRelatorio || 'Parecer Descritivo Pedagógico'} — ${nome}`,
+    introducaoContexto: `O presente parecer tem como objetivo registrar o acompanhamento pedagógico do(a) estudante ${nome}, regularmente matriculado(a) no ${anoSerie || 'Ensino Fundamental'}, durante o período de ${periodo || 'avaliação'} na disciplina de ${disciplina || 'Componente Curricular'}.`,
+    desenvolvimentoCognitivo: `No âmbito do desenvolvimento cognitivo e acadêmico, ${nome} demonstrou uma trajetória de aprendizado positiva. ${pontosFortes || 'Demonstra boa retenção de conteúdos e engajamento nas propostas pedagógicas.'} ${desafiosAprendizagem ? `Identificamos como foco de atenção contínua: ${desafiosAprendizagem}` : 'Mantém um ritmo de estudos consistente.'}`,
+    desenvolvimentoSocioemocional: `Em relação aos aspectos sociocomportamentais e à convivência escolar, ${nome} ${comportamentoSocioemocional || 'relaciona-se de maneira respeitosa e harmoniosa com os colegas e equipe docente, participando ativamente das dinâmicas de grupo.'}`,
+    pontosFortesDestacados: [
+      pontosFortes || 'Participação ativa nas discussões em sala de aula',
+      'Cumprimento responsável dos prazos das atividades propostas',
+      'Boa capacidade de cooperação e trabalho em equipe'
+    ],
+    desafiosECombinados: [
+      desafiosAprendizagem || 'Aprimoramento do hábito de leitura diária autônoma',
+      'Organização contínua do material e tempo de estudo individual'
+    ],
+    recomendacoesPedagógicas: recomendacoesFamilia || `Recomenda-se à família manter o acompanhamento diário da agenda escolar, estabelecendo uma rotina de estudos em casa e incentivando a leitura extracurricular.`,
+    consideracoesFinais: `Reiteramos nossa confiança no contínuo progresso de ${nome} e permanecemos à disposição para parcerias e alinhamentos pedagógicos constantes.`
+  };
+}
+

@@ -4,6 +4,8 @@ import Header from './components/Header';
 import HeroSection from './components/HeroSection';
 import LessonPlanForm from './components/LessonPlanForm';
 import PeiForm from './components/PeiForm';
+import DidacticSequenceForm from './components/DidacticSequenceForm';
+import PedagogicalReportForm from './components/PedagogicalReportForm';
 import PlanViewer from './components/PlanViewer';
 import BnccExplorer from './components/BnccExplorer';
 import SavedPlansList from './components/SavedPlansList';
@@ -11,7 +13,16 @@ import ApiKeyModal from './components/ApiKeyModal';
 import PublicLandingPage from './components/PublicLandingPage';
 import Footer from './components/Footer';
 
-import { generateLessonPlanWithAI, generatePeiWithAI, generateMockLessonPlan, generateMockPei } from './services/deepseekService';
+import { 
+  generateLessonPlanWithAI, 
+  generatePeiWithAI, 
+  generateDidacticSequenceWithAI,
+  generatePedagogicalReportWithAI,
+  generateMockLessonPlan, 
+  generateMockPei,
+  generateMockDidacticSequence,
+  generateMockPedagogicalReport
+} from './services/deepseekService';
 import { getStoredApiKey } from './utils/storage';
 import { getStoredSessionUser, logoutUser, auth, updateUserRedeEnsino } from './services/firebaseService';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -115,6 +126,52 @@ export default function App() {
     }
   };
 
+  // Handler de Geração de Sequência Didática
+  const handleGenerateDidacticSequence = async (formData, useAi = true) => {
+    setIsLoading(true);
+    try {
+      let result;
+      if (useAi && getStoredApiKey()) {
+        result = await generateDidacticSequenceWithAI(formData);
+      } else {
+        result = generateMockDidacticSequence(formData);
+      }
+
+      setGeneratedPlan({
+        ...formData,
+        content: result
+      });
+    } catch (err) {
+      console.error('Erro na geração da Sequência Didática:', err);
+      alert(err.message || 'Erro ao gerar a Sequência Didática.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handler de Geração de Relatório Pedagógico / Parecer
+  const handleGeneratePedagogicalReport = async (formData, useAi = true) => {
+    setIsLoading(true);
+    try {
+      let result;
+      if (useAi && getStoredApiKey()) {
+        result = await generatePedagogicalReportWithAI(formData);
+      } else {
+        result = generateMockPedagogicalReport(formData);
+      }
+
+      setGeneratedPlan({
+        ...formData,
+        content: result
+      });
+    } catch (err) {
+      console.error('Erro na geração do Relatório Pedagógico:', err);
+      alert(err.message || 'Erro ao gerar o Relatório Pedagógico.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Selecionar plano do histórico
   const handleSelectSavedPlan = (plan) => {
     setGeneratedPlan(plan);
@@ -182,6 +239,14 @@ export default function App() {
               />
             )}
 
+            {activeTab === 'sequence' && (
+              <DidacticSequenceForm
+                onGenerate={handleGenerateDidacticSequence}
+                isLoading={isLoading}
+                user={user}
+              />
+            )}
+
             {activeTab === 'pei' && (
               <PeiForm
                 onGenerate={handleGeneratePei}
@@ -189,6 +254,13 @@ export default function App() {
                 apiKeyConfigured={apiKeyConfigured}
                 onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
                 user={user}
+              />
+            )}
+
+            {activeTab === 'report' && (
+              <PedagogicalReportForm
+                onGenerate={handleGeneratePedagogicalReport}
+                isLoading={isLoading}
               />
             )}
 

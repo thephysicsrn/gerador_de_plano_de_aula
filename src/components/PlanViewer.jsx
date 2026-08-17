@@ -1,37 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Download, FileText, Copy, Printer, Save, Check, ArrowLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { Download, FileText, Copy, Check, Save, ArrowLeft, Printer } from 'lucide-react';
 import { exportToWord, exportToPdf, copyToClipboard } from '../services/exportService';
 import { savePlan } from '../utils/storage';
 
 export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
-  const [editableData, setEditableData] = useState(plan);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
-  useEffect(() => {
-    setEditableData(plan);
-    setSaved(false);
-  }, [plan]);
+  if (!plan) return null;
 
-  if (!editableData) return null;
-
-  const isPei = editableData.type === 'PEI';
-  const content = editableData.content || editableData;
-
-  const handleFieldChange = (field, value) => {
-    setEditableData(prev => ({
-      ...prev,
-      content: {
-        ...(prev.content || prev),
-        [field]: value
-      }
-    }));
-  };
+  const isPei = plan.isPei || plan.type === 'pei';
+  const isSequence = plan.isSequence || plan.type === 'sequence';
+  const isReport = plan.isReport || plan.type === 'report';
+  const content = plan.content || plan;
+  const editableData = { ...plan, ...content };
 
   const handleSave = () => {
-    const userIdentifier = user?.uid || user?.email || 'guest';
-    savePlan(editableData, userIdentifier);
+    savePlan(plan, user?.uid || '');
     setSaved(true);
     if (onSaveSuccess) onSaveSuccess();
     setTimeout(() => setSaved(false), 3000);
@@ -58,9 +44,10 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
   const handlePdfExport = async () => {
     setIsExporting(true);
     try {
-      const rawTitle = content.titulo || editableData.conteudoProgramatico || editableData.nomeAluno || 'Documento';
+      const rawTitle = content.titulo || content.tituloRelatorio || editableData.conteudoProgramatico || editableData.nomeAluno || 'Documento';
       const cleanTitle = rawTitle.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '_').replace(/_+/g, '_');
-      const filename = `${isPei ? 'PEI' : 'Plano_Aula'}_${cleanTitle}.pdf`;
+      const prefix = isPei ? 'PEI' : (isSequence ? 'Sequencia' : (isReport ? 'Relatorio' : 'Plano_Aula'));
+      const filename = `${prefix}_${cleanTitle}.pdf`;
       await exportToPdf('a4-document-paper', filename);
     } catch (err) {
       console.error(err);
@@ -113,19 +100,65 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
           {/* Cabeçalho Institucional */}
           <div className="doc-header">
             <div className="doc-badge">
-              {isPei ? 'PLANO DE ENSINO INDIVIDUALIZADO (PEI)' : 'PLANO DE AULA / MATRIZ PEDAGÓGICA'}
+              {isPei && 'PLANO DE ENSINO INDIVIDUALIZADO (PEI)'}
+              {isSequence && 'SEQUÊNCIA DIDÁTICA ENCADEDA'}
+              {isReport && 'RELATÓRIO PEDAGÓGICO & PARECER DESCRITIVO'}
+              {!isPei && !isSequence && !isReport && 'PLANO DE AULA / MATRIZ PEDAGÓGICA'}
             </div>
             <h1 className="doc-title">
-              {isPei 
-                ? `PEI: ${editableData.nomeAluno || 'Estudante'}` 
-                : (content.titulo || `Plano de Aula - ${editableData.disciplina}`)}
+              {isPei && `PEI: ${editableData.nomeAluno || 'Estudante'}`}
+              {isSequence && (content.titulo || `Sequência Didática - ${editableData.disciplina}`)}
+              {isReport && (content.tituloRelatorio || `Relatório Pedagógico - ${editableData.nomeAluno}`)}
+              {!isPei && !isSequence && !isReport && (content.titulo || `Plano de Aula - ${editableData.disciplina}`)}
             </h1>
-            <p className="doc-subtitle">Base Curricular & Diretrizes Nacionais de Educação</p>
+            <p className="doc-subtitle">Base Curricular & Diretrizes Nacionais de Educação (MEC / BNCC / SESI)</p>
           </div>
 
           {/* Tabela de Metadados */}
           <div className="doc-meta-grid">
-            {!isPei ? (
+            {isReport ? (
+              <>
+                <div className="meta-item">
+                  <span className="meta-label">Estudante:</span>
+                  <span className="meta-value font-semibold">{editableData.nomeAluno}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Série / Ano:</span>
+                  <span className="meta-value">{editableData.anoSerie}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Componente Curricular:</span>
+                  <span className="meta-value">{editableData.disciplina}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Período de Avaliação:</span>
+                  <span className="meta-value font-semibold text-indigo-700">{editableData.periodo}</span>
+                </div>
+              </>
+            ) : isSequence ? (
+              <>
+                <div className="meta-item">
+                  <span className="meta-label">Disciplina:</span>
+                  <span className="meta-value">{editableData.disciplina}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Série / Ano:</span>
+                  <span className="meta-value">{editableData.anoSerie}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Duração Prevista:</span>
+                  <span className="meta-value font-semibold">{editableData.numeroAulas}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Metodologia:</span>
+                  <span className="meta-value text-indigo-700">{editableData.tipoMetodologia}</span>
+                </div>
+                <div className="meta-item col-span-full">
+                  <span className="meta-label">Unidade Temática:</span>
+                  <span className="meta-value font-semibold">{editableData.unidadeTematica}</span>
+                </div>
+              </>
+            ) : !isPei ? (
               <>
                 <div className="meta-item">
                   <span className="meta-label">Disciplina / Componente:</span>
@@ -166,42 +199,125 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
             )}
           </div>
 
-          {/* Seção Habilidades BNCC Detalhadas */}
+          {/* Seção Habilidades BNCC (se houver) */}
           {((editableData.habilidadesBNCC && editableData.habilidadesBNCC.length > 0) ||
             (editableData.habilidadesBNCCAlvo && editableData.habilidadesBNCCAlvo.length > 0)) && (
             <div className="doc-section">
               <h3 className="doc-section-title">Habilidades da BNCC Mobilizadas</h3>
               <div className="doc-bncc-box">
-                {(content.habilidadesDetalhadas && Array.isArray(content.habilidadesDetalhadas)) ? (
-                  content.habilidadesDetalhadas.map((item, idx) => (
-                    <div key={idx} className="doc-bncc-item-detailed mb-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="doc-bncc-code font-bold bg-slate-900 text-white px-2 py-0.5 rounded text-xs">{item.code}</span>
-                        {item.descricaoOficial && <span className="text-xs text-slate-600 dark:text-slate-400 italic">{item.descricaoOficial}</span>}
-                      </div>
-                      {item.detalhamento && (
-                        <p className="text-xs text-slate-700 dark:text-slate-300 mt-1 pl-2 border-l-2 border-slate-400">
-                          <strong>Mediação Pedagógica:</strong> {item.detalhamento}
-                        </p>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  (editableData.habilidadesBNCC || editableData.habilidadesBNCCAlvo).map(skill => (
-                    <div key={skill.code} className="doc-bncc-item">
-                      <span className="doc-bncc-code">{skill.code}</span>
-                      <span className="doc-bncc-text">{skill.description}</span>
-                    </div>
-                  ))
-                )}
+                {(editableData.habilidadesBNCC || editableData.habilidadesBNCCAlvo).map(skill => (
+                  <div key={skill.code} className="doc-bncc-item">
+                    <span className="doc-bncc-code">{skill.code}</span>
+                    <span className="doc-bncc-text">{skill.description}</span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
-          {/* Conteúdo Dinâmico do Plano de Aula */}
-          {!isPei && (
+          {/* CONTEÚDO DA SEQUÊNCIA DIDÁTICA */}
+          {isSequence && (
             <>
-              {/* Objetivo Geral */}
+              {content.objetivoGeral && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">1. Objetivo Geral da Sequência</h3>
+                  <p className="doc-paragraph">{content.objetivoGeral}</p>
+                </div>
+              )}
+
+              {content.aulasEncadeadas && Array.isArray(content.aulasEncadeadas) && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">2. Estrutura das Aulas Encadeadas</h3>
+                  <div className="doc-steps">
+                    {content.aulasEncadeadas.map((aula, idx) => (
+                      <div key={idx} className="step-card mb-4">
+                        <div className="step-header">
+                          <span className="step-title">{aula.aulaNumero}: {aula.temaAula}</span>
+                        </div>
+                        <p className="step-desc mt-1"><strong>Objetivo:</strong> {aula.objetivoEspecifico}</p>
+                        <p className="step-desc mt-1"><strong>Desenvolvimento:</strong> {aula.desenvolvimento}</p>
+                        <p className="step-desc mt-1"><strong>Recursos:</strong> {aula.recursos}</p>
+                        <p className="step-desc mt-1"><strong>Avaliação Formativa:</strong> {aula.avaliacaoFormacao}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {content.avaliacaoFinalSequencia && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">3. Critérios de Avaliação Final da Sequência</h3>
+                  <p className="doc-paragraph">{content.avaliacaoFinalSequencia}</p>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* CONTEÚDO DO RELATÓRIO PEDAGÓGICO / PARECER */}
+          {isReport && (
+            <>
+              {content.introducaoContexto && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">1. Contextualização Inicial</h3>
+                  <p className="doc-paragraph">{content.introducaoContexto}</p>
+                </div>
+              )}
+
+              {content.desenvolvimentoCognitivo && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">2. Desenvolvimento Cognitivo e Acadêmico</h3>
+                  <p className="doc-paragraph">{content.desenvolvimentoCognitivo}</p>
+                </div>
+              )}
+
+              {content.desenvolvimentoSocioemocional && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">3. Aspectos Sociocomportamentais e Afetivos</h3>
+                  <p className="doc-paragraph">{content.desenvolvimentoSocioemocional}</p>
+                </div>
+              )}
+
+              {content.pontosFortesDestacados && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">4. Destaques e Pontos Fortes</h3>
+                  <ul className="doc-list">
+                    {Array.isArray(content.pontosFortesDestacados)
+                      ? content.pontosFortesDestacados.map((item, i) => <li key={i}>{item}</li>)
+                      : <li>{content.pontosFortesDestacados}</li>}
+                  </ul>
+                </div>
+              )}
+
+              {content.desafiosECombinados && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">5. Aspectos em Desenvolvimento e Combinados</h3>
+                  <ul className="doc-list">
+                    {Array.isArray(content.desafiosECombinados)
+                      ? content.desafiosECombinados.map((item, i) => <li key={i}>{item}</li>)
+                      : <li>{content.desafiosECombinados}</li>}
+                  </ul>
+                </div>
+              )}
+
+              {content.recomendacoesPedagógicas && (
+                <div className="doc-section doc-section-highlight">
+                  <h3 className="doc-section-title">6. Recomendações para a Família & Próximo Período</h3>
+                  <p className="doc-paragraph">{content.recomendacoesPedagógicas}</p>
+                </div>
+              )}
+
+              {content.consideracoesFinais && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">7. Considerações Finais</h3>
+                  <p className="doc-paragraph">{content.consideracoesFinais}</p>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* CONTEÚDO DO PLANO DE AULA PADRÃO */}
+          {!isPei && !isSequence && !isReport && (
+            <>
               {content.objetivoGeral && (
                 <div className="doc-section">
                   <h3 className="doc-section-title">1. Objetivo Geral</h3>
@@ -209,7 +325,6 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                 </div>
               )}
 
-              {/* Objetivos Específicos */}
               {content.objetivosEspecificos && (
                 <div className="doc-section">
                   <h3 className="doc-section-title">2. Objetivos Específicos</h3>
@@ -221,7 +336,6 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                 </div>
               )}
 
-              {/* Passo a Passo Metodológico */}
               {content.desenvolvimentoPassoAPasso && (
                 <div className="doc-section">
                   <h3 className="doc-section-title">3. Desenvolvimento da Aula (Passo a Passo)</h3>
@@ -239,7 +353,6 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                 </div>
               )}
 
-              {/* Estratégia Metodológica */}
               {content.estrategiaMetodologica && (
                 <div className="doc-section">
                   <h3 className="doc-section-title">4. Estratégia e Recursos Metodológicos</h3>
@@ -247,7 +360,6 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                 </div>
               )}
 
-              {/* Recursos Didáticos */}
               {content.recursosDidaticos && (
                 <div className="doc-section">
                   <h3 className="doc-section-title">5. Recursos Didáticos Necessários</h3>
@@ -259,7 +371,6 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                 </div>
               )}
 
-              {/* Avaliação Formativa */}
               {content.avaliacaoFormativa && (
                 <div className="doc-section">
                   <h3 className="doc-section-title">6. Avaliação Formativa</h3>
@@ -267,7 +378,6 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                 </div>
               )}
 
-              {/* Atividades de Fixação */}
               {content.atividadesFixacao && (
                 <div className="doc-section">
                   <h3 className="doc-section-title">7. Atividades de Fixação / Tarefa</h3>
@@ -275,7 +385,6 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                 </div>
               )}
 
-              {/* Adaptação Inclusiva */}
               {content.adaptacaoInclusiva && (
                 <div className="doc-section doc-section-highlight">
                   <h3 className="doc-section-title">8. Dica de Acessibilidade / Inclusão</h3>
@@ -285,7 +394,7 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
             </>
           )}
 
-          {/* Conteúdo Dinâmico do PEI */}
+          {/* CONTEÚDO DO PEI */}
           {isPei && (
             <>
               {content.perfilAluno && (
@@ -354,7 +463,7 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                 <span>Coordenação Pedagógica / AEE</span>
               </div>
             </div>
-            <p className="doc-footer-note">Gerado pelo Edu.Plan • Conforme as diretrizes da BNCC (MEC)</p>
+            <p className="doc-footer-note">Gerado pelo Edu.Plan • Conforme as diretrizes da BNCC (MEC / SESI)</p>
           </div>
         </div>
       </div>

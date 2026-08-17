@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, HeartHandshake, Database, ArrowRight } from 'lucide-react';
+import { FileText, HeartHandshake, Database, ArrowRight, Layers, UserCheck } from 'lucide-react';
 
 export default function HeroSection({ onSelectTab }) {
   return (
@@ -7,10 +7,10 @@ export default function HeroSection({ onSelectTab }) {
       {/* Título Principal */}
       <div className="hero-podia-header">
         <h1 className="hero-podia-title">
-          Edu.Plan — O sistema completo para seus planos de aula e PEI
+          Edu.Plan — O estúdio completo para seus planejamentos e documentos pedagógicos
         </h1>
         <p className="hero-podia-subtitle">
-          Crie, personalize e exporte planos de aula alinhados à BNCC e Planos de Ensino Individualizados em segundos com inteligência artificial.
+          Crie planos de aula, sequências didáticas encadeadas, relatórios descritivos e PEIs inclusivos em segundos com Inteligência Artificial.
         </p>
         <div className="hero-cta-group">
           <button className="btn-podia-hero-black" onClick={() => onSelectTab('lesson-plan')}>
@@ -20,7 +20,7 @@ export default function HeroSection({ onSelectTab }) {
         </div>
       </div>
 
-      {/* Grid com os 3 Cards de Cores da Podia */}
+      {/* Grid com os Cards de Ação Rápidos da Podia */}
       <div className="podia-cards-grid">
         {/* CARD 1: PLANO DE AULA (AZUL PASTEL) */}
         <div
@@ -41,7 +41,26 @@ export default function HeroSection({ onSelectTab }) {
           </div>
         </div>
 
-        {/* CARD 2: PEI INCLUSIVO (OCRE/DOURO PASTEL) */}
+        {/* CARD 2: SEQUÊNCIA DIDÁTICA (ROXO PASTEL) */}
+        <div
+          className="podia-feature-card card-purple"
+          onClick={() => onSelectTab('sequence')}
+        >
+          <div className="card-top">
+            <span className="card-tag">Sequência Didática ›</span>
+            <p className="card-desc">
+              Crie um plano articulado de 4 a 8 aulas encadeadas para cobrir uma unidade temática inteira.
+            </p>
+          </div>
+          <div className="card-bottom">
+            <div className="card-mock-ui">
+              <Layers className="w-5 h-5 mr-2 shrink-0" />
+              <span>Planejamento de 4 a 8 Aulas</span>
+            </div>
+          </div>
+        </div>
+
+        {/* CARD 3: PEI INCLUSIVO (OCRE/DOURO PASTEL) */}
         <div
           className="podia-feature-card card-ochre"
           onClick={() => onSelectTab('pei')}
@@ -60,13 +79,32 @@ export default function HeroSection({ onSelectTab }) {
           </div>
         </div>
 
-        {/* CARD 3: BASE BNCC & MATRIZ (ROXO/LAVANDA PASTEL) */}
+        {/* CARD 4: RELATÓRIO PEDAGÓGICO (VERDE PASTEL) */}
         <div
-          className="podia-feature-card card-purple"
+          className="podia-feature-card card-teal"
+          onClick={() => onSelectTab('report')}
+        >
+          <div className="card-top">
+            <span className="card-tag">Parecer Descritivo ›</span>
+            <p className="card-desc">
+              Relatórios de acompanhamento do aluno, pareceres descritivos e recomendações para reuniões de pais.
+            </p>
+          </div>
+          <div className="card-bottom">
+            <div className="card-mock-ui">
+              <UserCheck className="w-5 h-5 mr-2 shrink-0" />
+              <span>Acompanhamento Individual</span>
+            </div>
+          </div>
+        </div>
+
+        {/* CARD 5: BASE BNCC & MATRIZ (CINZA/AZUL PASTEL) */}
+        <div
+          className="podia-feature-card card-blue"
           onClick={() => onSelectTab('bncc')}
         >
           <div className="card-top">
-            <span className="card-tag">Base BNCC & Matriz ›</span>
+            <span className="card-tag">Base BNCC & Matriz SESI ›</span>
             <p className="card-desc">
               Consulte todas as habilidades oficiais da BNCC e cadastre o conteúdo da matriz própria da escola.
             </p>

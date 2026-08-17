@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, FileText, HeartHandshake, Database, BookmarkCheck, Sparkles, Sun, Moon, LogOut, User, Building2, ChevronDown } from 'lucide-react';
+import { Home, FileText, HeartHandshake, Database, BookmarkCheck, Sparkles, Sun, Moon, LogOut, User, Building2, ChevronDown, Layers, UserCheck } from 'lucide-react';
 
 export default function Header({ activeTab, setActiveTab, darkMode, setDarkMode, onOpenApiKeyModal, user, onLogout, onToggleRedeEnsino }) {
   const isSesi = user?.redeEnsino === 'REDE_SESI';
@@ -47,11 +47,27 @@ export default function Header({ activeTab, setActiveTab, darkMode, setDarkMode,
           </button>
 
           <button
+            className={`nav-link-podia ${activeTab === 'sequence' ? 'active' : ''}`}
+            onClick={() => setActiveTab('sequence')}
+          >
+            <Layers className="w-4 h-4 mr-1.5 shrink-0" />
+            <span>Sequência Didática</span>
+          </button>
+
+          <button
             className={`nav-link-podia ${activeTab === 'pei' ? 'active' : ''}`}
             onClick={() => setActiveTab('pei')}
           >
             <HeartHandshake className="w-4 h-4 mr-1.5 shrink-0" />
             <span>PEI Inclusivo</span>
+          </button>
+
+          <button
+            className={`nav-link-podia ${activeTab === 'report' ? 'active' : ''}`}
+            onClick={() => setActiveTab('report')}
+          >
+            <UserCheck className="w-4 h-4 mr-1.5 shrink-0" />
+            <span>Relatório Pedagógico</span>
           </button>
 
           <button
