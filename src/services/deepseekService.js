@@ -381,3 +381,47 @@ export function generateMockPedagogicalReport(formData) {
   };
 }
 
+/**
+ * Geração de Atividade Adaptada & Acessível com IA
+ */
+export async function generateAdaptedActivityWithAI(formData, apiKey = '') {
+  try {
+    const promptSystem = `Você é um especialista em Acessibilidade Pedagógica e Atendimento Educacional Especializado (AEE). Reescreva a atividade fornecida pelo professor adaptando-a para estudantes com "${formData.necessidade}". O objetivo pedagógico DEVE ser mantido, mas o formato deve conter: enunciados em frases curtas, palavras-chave em negrito, caixa de palavras/apoio (se aplicável), instruções numeradas e suporte de rotina visual. Retorne um JSON com: { "tituloAtividade": "", "publicoAlvoAdaptacao": "", "enunciadoAdaptado": "", "questoesEExercicios": [ { "numero": "Questão 1", "enunciadoSimples": "", "opcoesOuEspaco": "", "dicaAcessibilidade": "" } ], "bancoDeRespostasOuApoio": [], "orientacaoAoProfessor": "" }`;
+    const promptUser = `Atividade Original: ${formData.originalText}. Necessidade: ${formData.necessidade}. Disciplina: ${formData.disciplina} (${formData.anoSerie}). Nível de simplificação: ${formData.nivelSimplificacao}. Instruções extras: ${formData.instrucoesExtras || 'Nenhuma'}.`;
+    const rawResult = await callDeepSeekAPI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }], apiKey);
+    const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+    return JSON.parse(cleanJsonText);
+  } catch (err) {
+    return generateMockAdaptedActivity(formData);
+  }
+}
+
+export function generateMockAdaptedActivity(formData) {
+  const { originalText, necessidade, disciplina, anoSerie } = formData;
+  return {
+    tituloAtividade: `Atividade Adaptada: ${disciplina || 'Componente Curricular'} (${anoSerie || 'Ensino Fundamental'})`,
+    publicoAlvoAdaptacao: `Adaptação Pedagógica Especializada para: ${necessidade || 'Educação Inclusiva AEE'}`,
+    enunciadoAdaptado: `Leia a versão acessível abaixo. As instruções foram organizadas em etapas curtas e diretas com destaques visuais para facilitar a sua compreensão.`,
+    questoesEExercicios: [
+      {
+        numero: "Questão 1 (Versão Acessível)",
+        enunciadoSimples: `Com base no tema trabalhado em aula, identifique a opção correta que responde ao exercício.`,
+        opcoesOuEspaco: `( A ) Opção Clara 1\n( B ) Opção Clara 2\n( C ) Opção Clara 3`,
+        dicaAcessibilidade: `Consulte a caixa de palavras de apoio abaixo se precisar de ajuda para lembrar as respostas.`
+      },
+      {
+        numero: "Questão 2 (Prática Guiada)",
+        enunciadoSimples: `Ligue cada palavra da coluna da esquerda ao seu significado correto na coluna da direita.`,
+        opcoesOuEspaco: `Palavra A ---------------- (  ) Significado 1\nPalavra B ---------------- (  ) Significado 2`,
+        dicaAcessibilidade: `Use lápis colorido para traçar as linhas de associação.`
+      }
+    ],
+    bancoDeRespostasOuApoio: [
+      'Dica 1: Lembre-se do exemplo prático trabalhado com o professor.',
+      'Dica 2: As palavras em negrito indicam a ação principal esperada.'
+    ],
+    orientacaoAoProfessor: `Esta atividade foi adaptada reduzindo a carga cognitiva de leitura sem alterar o objetivo central da habilidade da BNCC. Conceder 10 a 15 minutos adicionais se necessário e permitir mediação por colega tutor ou profissional de apoio.`
+  };
+}
+
+

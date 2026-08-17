@@ -6,6 +6,7 @@ import LessonPlanForm from './components/LessonPlanForm';
 import PeiForm from './components/PeiForm';
 import DidacticSequenceForm from './components/DidacticSequenceForm';
 import PedagogicalReportForm from './components/PedagogicalReportForm';
+import AdaptedActivityForm from './components/AdaptedActivityForm';
 import PlanViewer from './components/PlanViewer';
 import BnccExplorer from './components/BnccExplorer';
 import SavedPlansList from './components/SavedPlansList';
@@ -18,10 +19,12 @@ import {
   generatePeiWithAI, 
   generateDidacticSequenceWithAI,
   generatePedagogicalReportWithAI,
+  generateAdaptedActivityWithAI,
   generateMockLessonPlan, 
   generateMockPei,
   generateMockDidacticSequence,
-  generateMockPedagogicalReport
+  generateMockPedagogicalReport,
+  generateMockAdaptedActivity
 } from './services/deepseekService';
 import { getStoredApiKey } from './utils/storage';
 import { getStoredSessionUser, logoutUser, auth, updateUserRedeEnsino } from './services/firebaseService';
@@ -172,6 +175,29 @@ export default function App() {
     }
   };
 
+  // Handler de Geração de Atividade Adaptada
+  const handleGenerateAdaptedActivity = async (formData, useAi = true) => {
+    setIsLoading(true);
+    try {
+      let result;
+      if (useAi && getStoredApiKey()) {
+        result = await generateAdaptedActivityWithAI(formData);
+      } else {
+        result = generateMockAdaptedActivity(formData);
+      }
+
+      setGeneratedPlan({
+        ...formData,
+        content: result
+      });
+    } catch (err) {
+      console.error('Erro na geração da Atividade Adaptada:', err);
+      alert(err.message || 'Erro ao gerar a Atividade Adaptada.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Selecionar plano do histórico
   const handleSelectSavedPlan = (plan) => {
     setGeneratedPlan(plan);
@@ -254,6 +280,13 @@ export default function App() {
                 apiKeyConfigured={apiKeyConfigured}
                 onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
                 user={user}
+              />
+            )}
+
+            {activeTab === 'adapted-activity' && (
+              <AdaptedActivityForm
+                onGenerate={handleGenerateAdaptedActivity}
+                isLoading={isLoading}
               />
             )}
 

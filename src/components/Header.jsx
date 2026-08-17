@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, FileText, HeartHandshake, Database, BookmarkCheck, Sparkles, Sun, Moon, LogOut, User, Building2, ChevronDown, Layers, UserCheck } from 'lucide-react';
+import { Home, FileText, HeartHandshake, Database, BookmarkCheck, Sparkles, Sun, Moon, LogOut, User, Building2, ChevronDown, Layers, UserCheck, Accessibility } from 'lucide-react';
 
 export default function Header({ activeTab, setActiveTab, darkMode, setDarkMode, onOpenApiKeyModal, user, onLogout, onToggleRedeEnsino }) {
   const isSesi = user?.redeEnsino === 'REDE_SESI';
@@ -51,7 +51,7 @@ export default function Header({ activeTab, setActiveTab, darkMode, setDarkMode,
             onClick={() => setActiveTab('sequence')}
           >
             <Layers className="w-4 h-4 mr-1.5 shrink-0" />
-            <span>Sequência Didática</span>
+            <span>Sequência</span>
           </button>
 
           <button
@@ -59,7 +59,15 @@ export default function Header({ activeTab, setActiveTab, darkMode, setDarkMode,
             onClick={() => setActiveTab('pei')}
           >
             <HeartHandshake className="w-4 h-4 mr-1.5 shrink-0" />
-            <span>PEI Inclusivo</span>
+            <span>PEI</span>
+          </button>
+
+          <button
+            className={`nav-link-podia ${activeTab === 'adapted-activity' ? 'active' : ''}`}
+            onClick={() => setActiveTab('adapted-activity')}
+          >
+            <Accessibility className="w-4 h-4 mr-1.5 shrink-0 text-rose-500" />
+            <span>Atividade Adaptada</span>
           </button>
 
           <button
@@ -67,7 +75,7 @@ export default function Header({ activeTab, setActiveTab, darkMode, setDarkMode,
             onClick={() => setActiveTab('report')}
           >
             <UserCheck className="w-4 h-4 mr-1.5 shrink-0" />
-            <span>Relatório Pedagógico</span>
+            <span>Relatório</span>
           </button>
 
           <button
@@ -83,7 +91,7 @@ export default function Header({ activeTab, setActiveTab, darkMode, setDarkMode,
             onClick={() => setActiveTab('history')}
           >
             <BookmarkCheck className="w-4 h-4 mr-1.5 shrink-0" />
-            <span>Planos Salvos</span>
+            <span>Salvos</span>
           </button>
         </nav>
 

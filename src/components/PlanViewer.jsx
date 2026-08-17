@@ -13,6 +13,7 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
   const isPei = plan.isPei || plan.type === 'pei';
   const isSequence = plan.isSequence || plan.type === 'sequence';
   const isReport = plan.isReport || plan.type === 'report';
+  const isAdaptedActivity = plan.isAdaptedActivity || plan.type === 'adaptedActivity';
   const content = plan.content || plan;
   const editableData = { ...plan, ...content };
 
@@ -44,9 +45,9 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
   const handlePdfExport = async () => {
     setIsExporting(true);
     try {
-      const rawTitle = content.titulo || content.tituloRelatorio || editableData.conteudoProgramatico || editableData.nomeAluno || 'Documento';
+      const rawTitle = content.titulo || content.tituloRelatorio || content.tituloAtividade || editableData.conteudoProgramatico || editableData.nomeAluno || 'Documento';
       const cleanTitle = rawTitle.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '_').replace(/_+/g, '_');
-      const prefix = isPei ? 'PEI' : (isSequence ? 'Sequencia' : (isReport ? 'Relatorio' : 'Plano_Aula'));
+      const prefix = isPei ? 'PEI' : (isSequence ? 'Sequencia' : (isReport ? 'Relatorio' : (isAdaptedActivity ? 'Atividade_Adaptada' : 'Plano_Aula')));
       const filename = `${prefix}_${cleanTitle}.pdf`;
       await exportToPdf('a4-document-paper', filename);
     } catch (err) {
@@ -103,20 +104,37 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
               {isPei && 'PLANO DE ENSINO INDIVIDUALIZADO (PEI)'}
               {isSequence && 'SEQUÊNCIA DIDÁTICA ENCADEDA'}
               {isReport && 'RELATÓRIO PEDAGÓGICO & PARECER DESCRITIVO'}
-              {!isPei && !isSequence && !isReport && 'PLANO DE AULA / MATRIZ PEDAGÓGICA'}
+              {isAdaptedActivity && 'ATIVIDADE ADAPTADA — EDUCAÇÃO INCLUSIVA AEE'}
+              {!isPei && !isSequence && !isReport && !isAdaptedActivity && 'PLANO DE AULA / MATRIZ PEDAGÓGICA'}
             </div>
             <h1 className="doc-title">
               {isPei && `PEI: ${editableData.nomeAluno || 'Estudante'}`}
               {isSequence && (content.titulo || `Sequência Didática - ${editableData.disciplina}`)}
               {isReport && (content.tituloRelatorio || `Relatório Pedagógico - ${editableData.nomeAluno}`)}
-              {!isPei && !isSequence && !isReport && (content.titulo || `Plano de Aula - ${editableData.disciplina}`)}
+              {isAdaptedActivity && (content.tituloAtividade || `Atividade Adaptada - ${editableData.disciplina}`)}
+              {!isPei && !isSequence && !isReport && !isAdaptedActivity && (content.titulo || `Plano de Aula - ${editableData.disciplina}`)}
             </h1>
             <p className="doc-subtitle">Base Curricular & Diretrizes Nacionais de Educação (MEC / BNCC / SESI)</p>
           </div>
 
           {/* Tabela de Metadados */}
           <div className="doc-meta-grid">
-            {isReport ? (
+            {isAdaptedActivity ? (
+              <>
+                <div className="meta-item">
+                  <span className="meta-label">Componente Curricular:</span>
+                  <span className="meta-value">{editableData.disciplina}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Série / Ano:</span>
+                  <span className="meta-value">{editableData.anoSerie}</span>
+                </div>
+                <div className="meta-item col-span-full">
+                  <span className="meta-label">Público-Alvo / Adaptação:</span>
+                  <span className="meta-value font-semibold text-rose-700">{editableData.necessidade}</span>
+                </div>
+              </>
+            ) : isReport ? (
               <>
                 <div className="meta-item">
                   <span className="meta-label">Estudante:</span>
@@ -315,8 +333,62 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
             </>
           )}
 
+          {/* CONTEÚDO DA ATIVIDADE ADAPTADA */}
+          {isAdaptedActivity && (
+            <>
+              {content.enunciadoAdaptado && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">1. Instruções e Orientação Acessível</h3>
+                  <p className="doc-paragraph">{content.enunciadoAdaptado}</p>
+                </div>
+              )}
+
+              {content.questoesEExercicios && Array.isArray(content.questoesEExercicios) && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">2. Exercícios Adaptados</h3>
+                  <div className="doc-steps">
+                    {content.questoesEExercicios.map((q, idx) => (
+                      <div key={idx} className="step-card mb-4 p-4 border border-slate-200 rounded-lg">
+                        <div className="step-header mb-2">
+                          <span className="step-title font-bold text-slate-900">{q.numero}</span>
+                        </div>
+                        <p className="step-desc text-sm text-slate-800 font-semibold mb-2">{q.enunciadoSimples}</p>
+                        {q.opcoesOuEspaco && (
+                          <pre className="bg-slate-50 p-3 rounded text-xs font-mono whitespace-pre-wrap text-slate-700 mb-2">
+                            {q.opcoesOuEspaco}
+                          </pre>
+                        )}
+                        {q.dicaAcessibilidade && (
+                          <p className="text-xs text-indigo-700 bg-indigo-50 p-2 rounded border border-indigo-200 italic">
+                            💡 <strong>Apoio/Dica:</strong> {q.dicaAcessibilidade}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {content.bancoDeRespostasOuApoio && Array.isArray(content.bancoDeRespostasOuApoio) && content.bancoDeRespostasOuApoio.length > 0 && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">3. Caixa de Palavras de Apoio / Banco de Dicas</h3>
+                  <ul className="doc-list">
+                    {content.bancoDeRespostasOuApoio.map((item, i) => <li key={i}>{item}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {content.orientacaoAoProfessor && (
+                <div className="doc-section doc-section-highlight">
+                  <h3 className="doc-section-title">4. Orientação Pedagógica de Aplicação (AEE)</h3>
+                  <p className="doc-paragraph">{content.orientacaoAoProfessor}</p>
+                </div>
+              )}
+            </>
+          )}
+
           {/* CONTEÚDO DO PLANO DE AULA PADRÃO */}
-          {!isPei && !isSequence && !isReport && (
+          {!isPei && !isSequence && !isReport && !isAdaptedActivity && (
             <>
               {content.objetivoGeral && (
                 <div className="doc-section">
