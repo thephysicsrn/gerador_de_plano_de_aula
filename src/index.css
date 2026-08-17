@@ -2180,3 +2180,511 @@ body:not(.dark-mode) .step-landing-desc {
   color: var(--text-main);
   font-weight: 700;
 }
+
+/* ==========================================================================
+   NOVAS SEÇÕES DA LANDING PAGE PÚBLICA (MÉTRICAS, REDE SESI, PREVIEW, FAQ)
+   ========================================================================== */
+
+/* 1. BARRA DE MÉTRICAS */
+.landing-stats-section {
+  width: 100%;
+  background: var(--bg-card);
+  border-y: 1px solid var(--border-color);
+  padding: 2.5rem 1.5rem;
+  margin: 2rem 0;
+}
+
+.stats-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+  flex: 1;
+  min-width: 200px;
+}
+
+.stat-number {
+  font-family: var(--font-heading);
+  font-size: 2.75rem;
+  font-weight: 900;
+  color: var(--text-main);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--text-main), #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stat-label {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 48px;
+  background: var(--border-color);
+}
+
+@media (max-width: 768px) {
+  .stat-divider {
+    display: none;
+  }
+}
+
+/* TÍTULOS DE SEÇÃO REUTILIZÁVEIS */
+.section-title-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #d97706;
+  margin-bottom: 1rem;
+}
+
+body.dark-mode .section-title-badge {
+  color: #fbbf24;
+}
+
+.section-main-title {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: var(--text-main);
+  letter-spacing: -0.03em;
+  margin-bottom: 0.65rem;
+  text-align: center;
+}
+
+.section-main-sub {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  max-width: 680px;
+  margin: 0 auto 3rem auto;
+  text-align: center;
+}
+
+/* 2. SEÇÃO DESTAQUE: REDE SESI VS BNCC GERAL */
+.section-network-highlight {
+  max-width: 1240px;
+  width: 100%;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.network-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  text-align: left;
+}
+
+@media (max-width: 840px) {
+  .network-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.network-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25 ease;
+}
+
+.network-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+
+.network-card.sesi-card {
+  border-left: 5px solid #059669;
+}
+
+.network-card.geral-card {
+  border-left: 5px solid #4f46e5;
+}
+
+.network-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.network-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  shrink: 0;
+}
+
+.bg-sesi {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 4px 14px rgba(16,185,129,0.35);
+}
+
+.bg-geral {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+}
+
+.network-badge-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #059669;
+  letter-spacing: 0.05em;
+}
+
+.network-badge-label-geral {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #4f46e5;
+  letter-spacing: 0.05em;
+}
+
+.network-card-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.network-card-desc {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.network-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.network-feature-list li {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* 3. PREVIEW INTERATIVO DE DOCUMENTO */
+.section-document-preview {
+  max-width: 1240px;
+  width: 100%;
+  margin: 4.5rem auto;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.preview-tab-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.preview-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preview-tab-btn.active {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+
+body.dark-mode .preview-tab-btn.active {
+  background: #ffffff;
+  color: #111111;
+  border-color: #ffffff;
+}
+
+.mockup-document-card {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  color: #1e293b;
+  border-radius: 1.5rem;
+  padding: 3rem;
+  text-align: left;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+  position: relative;
+}
+
+.mockup-doc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.mockup-doc-logo .logo-text {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.mockup-doc-logo .logo-dot {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #d97706;
+}
+
+.mockup-doc-tag {
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.35rem 0.85rem;
+  border-radius: 0.5rem;
+  margin-right: 0.75rem;
+}
+
+.mockup-doc-date {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.doc-preview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 0.85rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e2e8f0;
+
+}
+
+.doc-field {
+  font-size: 0.88rem;
+  color: #334155;
+}
+
+.doc-section-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.doc-box-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.75rem;
+}
+
+.doc-box-list {
+  padding-left: 1.25rem;
+  margin: 0;
+  font-size: 0.88rem;
+  color: #334155;
+}
+
+.doc-box-list li {
+  margin-bottom: 0.4rem;
+}
+
+.doc-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  font-size: 0.88rem;
+  color: #334155;
+  margin-bottom: 0.75rem;
+}
+
+.doc-time-badge {
+  background: #3b82f6;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  shrink: 0;
+}
+
+.doc-box-text {
+  font-size: 0.88rem;
+  color: #334155;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.mockup-doc-footer {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed #cbd5e1;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* 4. RECURSOS PEDAGÓGICOS DETALHADOS */
+.section-pedagogical-features {
+  max-width: 1240px;
+  width: 100%;
+  margin: 4.5rem auto;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.pedagogical-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+  text-align: left;
+}
+
+@media (max-width: 900px) {
+  .pedagogical-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .pedagogical-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pedagogical-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.pedagogical-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+
+.pedagogical-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.pedagogical-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* 5. SEÇÃO DE PERGUNTAS FREQUENTES (FAQ) */
+.section-faq {
+  max-width: 900px;
+  width: 100%;
+  margin: 4.5rem auto;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.faq-accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+}
+
+.faq-item {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: 1.25rem;
+  padding: 1.5rem 1.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.faq-item.open {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.faq-question-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.faq-question {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.faq-toggle-icon {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.faq-answer-box {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.faq-answer {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
