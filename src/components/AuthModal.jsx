@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, X, Sparkles, AlertCircle, Building2, CheckCircle2 } from 'lucide-react';
-import { signInUser, signUpUser, signInDemoUser } from '../services/firebaseService';
+import { User, Mail, Lock, X, AlertCircle, Building2, CheckCircle2 } from 'lucide-react';
+import { signInUser, signUpUser } from '../services/firebaseService';
 
 export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode = 'login' }) {
   const [mode, setMode] = useState(initialMode); // 'login' ou 'signup'
@@ -44,11 +44,6 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
     }
   };
 
-  const handleDemoLogin = (selectedRede) => {
-    const user = signInDemoUser(selectedRede || redeEnsino);
-    onAuthSuccess(user);
-    onClose();
-  };
 
   return (
     <div className="modal-backdrop">
@@ -180,19 +175,6 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
             ) : (
               <span>{mode === 'signup' ? 'Criar Minha Conta Grátis' : 'Entrar no Edu.Plan'}</span>
             )}
-          </button>
-
-          <div className="auth-divider">
-            <span>ou continue com</span>
-          </div>
-
-          <button
-            type="button"
-            className="auth-demo-btn"
-            onClick={() => handleDemoLogin('REDE_SESI')}
-          >
-            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-            <span>Entrar como Professor REDE SESI (Demonstração)</span>
           </button>
         </form>
 
