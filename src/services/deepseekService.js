@@ -28,7 +28,7 @@ export async function callDeepSeekAPI(messages, userApiKey = '') {
       model: 'deepseek-chat',
       messages: messages,
       temperature: 0.7,
-      max_tokens: 3500,
+      max_tokens: 6000,
       stream: false
     })
   });
@@ -481,11 +481,34 @@ Analise CUIDADOSAMENTE cada questão da atividade original, identifique seus tip
       [{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }],
       apiKey
     );
-    const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
-    return JSON.parse(cleanJsonText);
+
+    // Extração robusta de JSON — funciona mesmo se a IA adicionar texto antes/depois
+    let jsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+    // Tenta encontrar o bloco { } principal caso haja texto extra em volta
+    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      jsonText = jsonMatch[0];
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonText);
+    } catch (parseErr) {
+      console.error('Falha ao parsear JSON da IA. Resposta bruta:', rawResult);
+      throw new Error('A IA retornou uma resposta inválida. Tente novamente.');
+    }
+
+    // Valida campos mínimos esperados
+    if (!parsed.questoesEExercicios || !Array.isArray(parsed.questoesEExercicios)) {
+      throw new Error('A resposta da IA não contém as questões adaptadas. Tente novamente.');
+    }
+
+    return parsed;
   } catch (err) {
     console.error('Erro ao gerar atividade adaptada com IA:', err);
-    return generateMockAdaptedActivity(formData);
+    // Relança o erro para que o handler no App.jsx possa exibir ao usuário
+    throw err;
   }
 }
 
