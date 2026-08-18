@@ -543,46 +543,181 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-/* DASHBOARD CATEGORIES & GRID */
-.dashboard-category-block {
+/* STUDIO DASHBOARD REDESIGN */
+.dashboard-studio-container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 1.5rem 1rem 3rem 1rem;
 }
 
-.category-header-podia {
+.dashboard-hero-banner {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dashboard-hero-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  color: var(--text-main);
+  margin: 0.75rem 0 0.5rem 0;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.dashboard-hero-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  max-width: 620px;
+  margin: 0 auto 1.75rem auto;
+  line-height: 1.5;
+}
+
+/* BARRA DE FILTROS POR CATEGORIA */
+.dashboard-filter-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-card);
+  padding: 0.35rem 0.5rem;
+  border-radius: 9999px;
+  border: 1.5px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filter-btn {
+  padding: 0.45rem 1rem;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-card-subtle);
+}
+
+.filter-btn.active {
+  background: var(--podia-black);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* GRID SIMÉTRICO DE FERRAMENTAS */
+.dashboard-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* CARDS INDIVIDUAIS PREMIUM DA STUDIO */
+.studio-tool-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 230px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.studio-tool-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+
+.tool-card-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1.5px solid var(--border-color);
 }
 
-.category-title-podia {
-  font-size: 1.15rem;
+.tool-icon-badge {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-blue { background: #dbeafe; color: #1e40af; }
+.badge-indigo { background: #e0e7ff; color: #3730a3; }
+.badge-purple { background: #f3e8ff; color: #6b21a8; }
+.badge-emerald { background: #d1fae5; color: #065f46; }
+.badge-amber { background: #fef3c7; color: #92400e; }
+.badge-rose { background: #ffe4e6; color: #9f1239; }
+.badge-teal { background: #ccfbf1; color: #115e59; }
+.badge-sky { background: #e0f2fe; color: #0369a1; }
+
+.tool-tag-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  background: var(--bg-card-subtle);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.tool-card-body {
+  flex: 1;
+}
+
+.tool-card-title {
+  font-size: 1.1rem;
   font-weight: 800;
   color: var(--text-main);
-  margin: 0;
+  margin: 0 0 0.4rem 0;
   letter-spacing: -0.01em;
 }
 
-.hero-features-grid-podia {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 1.25rem;
+.tool-card-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0;
 }
 
-.hero-features-grid-podia.grid-cols-2 {
-  grid-template-columns: repeat(2, 1fr);
+.tool-card-footer {
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border-color);
 }
 
-@media (max-width: 768px) {
-  .hero-features-grid-podia,
-  .hero-features-grid-podia.grid-cols-2 {
-    grid-template-columns: 1fr;
-  }
+.tool-action-link {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.2s ease;
 }
+
+.studio-tool-card:hover .tool-action-link {
+  color: #2563eb;
+}
+
 
 .podia-feature-card {
   border-radius: 1.5rem;
