@@ -207,7 +207,7 @@ Retorne APENAS um objeto JSON válido (sem cercas markdown de código \`\`\`json
 }
 
 /**
- * Gerador de PEI ULTRA DETALHADO via DeepSeek
+ * Gerador de PEI ULTRA DETALHADO, ROBUSTO E COMPLETO via IA (MEC / AEE / LBI)
  */
 export async function generatePeiWithAI(formData, apiKey = '') {
   const {
@@ -221,39 +221,73 @@ export async function generatePeiWithAI(formData, apiKey = '') {
     recursosAcessibilidade
   } = formData;
 
-  const promptSystem = `Você é um especialista em Educação Inclusiva e Atendimento Educacional Especializado (AEE) no Brasil.
-Sua missão é gerar um Plano de Ensino Individualizado (PEI) extremamente detalhado, humano, prático e alinhado com a Legislação de Inclusão (LBI).
-Retorne APENAS um objeto JSON estruturado com as seguintes chaves:
+  const promptSystem = `Você é um doutor e consultor sênior em Educação Especial Inclusiva, Atendimento Educacional Especializado (AEE) e Neuropsicopedagogia Institucional, especialista nas diretrizes da Lei Brasileira de Inclusão (Lei nº 13.146/2015) e da BNCC.
+
+Sua missão é elaborar um **Plano de Ensino Individualizado (PEI) Completo, Robusto, Minucioso e Profissional**, pronto para ser homologado pela equipe pedagógica, sala de recursos multifuncionais (SRM) e coordenação escolar.
+
+Retorne APENAS um objeto JSON válido (sem cercas markdown de código \`\`\`json) com a seguinte estrutura EXATA:
 {
-  "perfilAluno": "Resumo completo do perfil do estudante, valorizando suas potencialidades e mapeando suas necessidades específicas",
-  "objetivosCurricularesAdaptados": [
-    "Objetivo adaptado 1 com metas de curto prazo",
-    "Objetivo adaptado 2 com metas de médio prazo",
-    "Objetivo adaptado 3 focado no desenvolvimento de autonomia"
+  "diagnosticoFuncional": "Avaliação pedagógica funcional minuciosa: histórico do estudante, características cognitivas, estilo e canal preferencial de aprendizagem (visual, cinestésico, auditivo), nível de atenção sustentada, sociabilidade e barreiras de acesso ao currículo identificadas.",
+  "potencialidadesEInteresses": [
+    "Potencialidade 1: Hiperfocos, talentos e áreas de maior facilidade que serão usados como âncoras pedagógicas",
+    "Potencialidade 2: Habilidades socioemocionais e pontos fortes de engajamento",
+    "Potencialidade 3: Formas funcionais de expressão e interação com pares"
+  ],
+  "barreirasAprendizagemIdentificadas": [
+    "Barreira 1: Sobrecarga sensorial / necessidade de previsibilidade e rotina estruturada",
+    "Barreira 2: Dificuldade na compreensão de instruções abstratas ou muito extensas",
+    "Barreira 3: Necessidade de tempo estendido e mediação direta na realização de tarefas complexas"
+  ],
+  "objetivosCurricularesAdaptados": {
+    "curtoPrazo": [
+      "Meta de 1 a 2 meses: Objetivo de adaptação imediata focado em acolhimento, engajamento e rotina",
+      "Meta de 1 a 2 meses: Compreensão inicial dos conceitos fundamentais por meio de material concreto/visual"
+    ],
+    "medioPrazo": [
+      "Meta semestral: Consolidação das habilidades adaptadas com redução gradual da mediação direta",
+      "Meta semestral: Participação colaborativa em pequenos grupos e realização autônoma de atividades estruturadas"
+    ],
+    "longoPrazo": [
+      "Meta anual: Desenvolvimento pleno da autonomia acadêmica e aplicação funcional das competências da BNCC para a sua faixa etária"
+    ]
+  },
+  "adaptacoesHabilidadesBNCC": [
+    {
+      "code": "CÓDIGO_BNCC",
+      "descricaoBNCC": "Descrição oficial da habilidade",
+      "objetivoAdaptado": "Objetivo de aprendizagem flexibilizado especificamente para o estudante",
+      "estrategiaDidatica": "Como o professor regente trabalhará esta habilidade em sala de aula passo a passo",
+      "recursoApoio": "Material adaptado, suporte visual ou ferramenta concreta utilizada"
+    }
   ],
   "estrategiasPedagogicasEspeciais": [
-    "Estratégia 1: Organização do ambiente e rotina visual",
-    "Estratégia 2: Adaptação de materiais e comandos diretos",
-    "Estratégia 3: Mediação e tutoria de pares"
+    "Estratégia 1 (Rotina & Previsibilidade): Uso de agenda visual na carteira, antecipação de mudanças de atividade e transições suaves",
+    "Estratégia 2 (Comunicação & Enunciados): Comandos em passos únicos, diretos, com palavras-chave em destaque e linguagem clara e literal",
+    "Estratégia 3 (Mediação Pedagógica): Mediação intencional do professor, pareamento com colega tutor e pausas ativas de autorregulação a cada 15-20 minutos",
+    "Estratégia 4 (Adaptação de Materiais): Redução de estímulos visuais concorrentes na folha, ampliação tipográfica e fragmentação de exercícios"
   ],
   "recursosTecnologiaAssistiva": [
-    "Recurso 1 de tecnologia assistiva ou comunicação alternativa (PECS, pranchas)",
-    "Recurso 2 de adaptação tátil/visual ou sensorial",
-    "Recurso 3 de suporte ergonômico ou digital"
+    "Recurso 1 (Comunicação Alternativa & Aumentativa - CAA): Pranchas temáticas de comunicação ou cartões visuais (PECS)",
+    "Recurso 2 (Suporte Sensorial & Físico): Fones abafadores de ruído, plano inclinado de escrita ou recursos de alta/baixa tecnologia",
+    "Recurso 3 (Recursos Digitais & Pedagógicos): Softwares educativos, jogos de pareamento e manipuláveis táteis"
   ],
-  "flexibilizacaoAvaliativa": "Métodos detalhados de avaliação adaptada, incluindo tempo estendido, provas com apoio visual e relatórios descritivos qualitativos.",
-  "acoesIntegradasFamiliaAEE": "Plano de ação conjunta entre os professores regentes, a equipe de AEE da sala de recursos e a família do estudante."
+  "planoAtendimentoAEE": "Detalhamento da atuação na Sala de Recursos Multifuncionais (SRM): cronograma e frequência semanal sugerida, objetivos do atendimento no contraturno, habilidades cognitivas e metacognitivas prioritárias e articulação contínua com o professor regente da sala comum.",
+  "flexibilizacaoAvaliativa": "Diretrizes e instrumentos de avaliação inclusiva: substituição de provas extensas por portfólio de atividades práticas, registro fotográfico/descritivo de avanços, tempo estendido (50% adicional), leitura oral de enunciados pelo professor/mediador e critérios focados na evolução individual em relação ao ponto de partida.",
+  "acoesIntegradasFamiliaAEE": "Protocolo de parceria escola-família-terapeutas: reuniões mensais de alinhamento, caderno de recados/comunicação diária ou semanal, continuidade de estratégias de autorregulação e estímulo à autonomia em casa, além de troca de relatórios periódicos com a equipe multidisciplinar de saúde externa.",
+  "cronogramaRevisaoPEI": "Datas e marcos periódicos para monitoramento (bimestral ou trimestral), verificação do alcance das metas de curto/médio prazo e ajustes pedagógicos necessários."
 }`;
 
-  const promptUser = `Crie o PEI detalhado para:
-- Estudante: ${nomeAluno || 'Aluno(a)'}
-- Série/Ano: ${anoSerie}
-- Disciplina/Área: ${disciplina}
-- Necessidade Educacional Especial: ${necessidadeEspecial}
-- Diagnóstico e Histórico: ${diagnosticoHistorico || 'Em acompanhamento multidisciplinar.'}
-- Potencialidades e Habilidades Atuais: ${habilidadesAtuais || 'Demonstra interesse em atividades visuais e práticas.'}
-- Habilidades BNCC a adaptar: ${habilidadesBNCCAlvo.map(h => `${h.code}: ${h.description}`).join('; ')}
-- Recursos de Acessibilidade disponíveis na escola: ${recursosAcessibilidade || 'Materiais pedagógicos adaptados, apoio visual e sala de recursos multifuncionais.'}`;
+  const promptUser = `Elabore um Plano de Ensino Individualizado (PEI) com o mais alto nível de detalhamento pedagógico, técnico e humano para o seguinte estudante:
+- Nome do Estudante: ${nomeAluno || 'Estudante'}
+- Série / Ano Escolar: ${anoSerie}
+- Componente Curricular / Área: ${disciplina}
+- Necessidade Educacional Especial / Diagnóstico: ${necessidadeEspecial}
+- Diagnóstico Clínico e Histórico Escolar: ${diagnosticoHistorico || 'Em acompanhamento multidisciplinar; necessita de mediação pedagógica intencional e adaptações de acesso ao currículo.'}
+- Habilidades Atuais, Potencialidades e Estilo de Aprendizagem: ${habilidadesAtuais || 'Apresenta boa resposta a estímulos visuais, materiais concretos e rotinas estruturadas.'}
+- Habilidades da BNCC a serem Flexibilizadas e Adaptadas: ${habilidadesBNCCAlvo && habilidadesBNCCAlvo.length > 0 ? habilidadesBNCCAlvo.map(h => `${h.code}: ${h.description}`).join('; ') : 'Habilidades essenciais do ano/série no componente de ' + disciplina}
+- Recursos e Infraestrutura de Acessibilidade Disponíveis: ${recursosAcessibilidade || 'Sala de Recursos Multifuncionais (AEE), materiais concretos adaptados, apoio visual e equipe pedagógica comprometida.'}
+
+Gere o PEI com riqueza de detalhes práticos, orientações aplicáveis em sala de aula e adaptações específicas para cada uma das habilidades da BNCC listadas.`;
 
   try {
     const rawResult = await callAI([
@@ -261,9 +295,14 @@ Retorne APENAS um objeto JSON estruturado com as seguintes chaves:
       { role: 'user', content: promptUser }
     ]);
 
-    const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
-    return JSON.parse(cleanJsonText);
+    let jsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      jsonText = jsonMatch[0];
+    }
+    return JSON.parse(jsonText);
   } catch (err) {
+    console.warn('Utilizando gerador de PEI pedagógico nativo detalhado:', err);
     return generateMockPei(formData);
   }
 }

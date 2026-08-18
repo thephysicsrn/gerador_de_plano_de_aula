@@ -102,12 +102,59 @@ export async function exportToWord(planData) {
   };
 
   if (isPei) {
-    if (contentObj.perfilAluno) addSection('1. Perfil e Potencialidades do Estudante', contentObj.perfilAluno);
-    if (contentObj.objetivosCurricularesAdaptados) addSection('2. Objetivos Curriculares Adaptados', contentObj.objetivosCurricularesAdaptados);
-    if (contentObj.estrategiasPedagogicasEspeciais) addSection('3. Estratégias Pedagógicas Diferenciadas', contentObj.estrategiasPedagogicasEspeciais);
-    if (contentObj.recursosTecnologiaAssistiva) addSection('4. Recursos de Acessibilidade e Tecnologia Assistiva', contentObj.recursosTecnologiaAssistiva);
-    if (contentObj.flexibilizacaoAvaliativa) addSection('5. Critérios e Flexibilização Avaliativa', contentObj.flexibilizacaoAvaliativa);
-    if (contentObj.acoesIntegradasFamiliaAEE) addSection('6. Ações Integradas (Família & AEE)', contentObj.acoesIntegradasFamiliaAEE);
+    if (contentObj.diagnosticoFuncional || contentObj.perfilAluno) {
+      addSection('1. Diagnóstico e Avaliação Pedagógica Funcional', contentObj.diagnosticoFuncional || contentObj.perfilAluno);
+    }
+    if (contentObj.potencialidadesEInteresses) {
+      addSection('2. Potencialidades, Interesses & Hiperfocos (Âncoras de Aprendizagem)', contentObj.potencialidadesEInteresses);
+    }
+    if (contentObj.barreirasAprendizagemIdentificadas) {
+      addSection('3. Barreiras de Acesso ao Currículo Mapeadas', contentObj.barreirasAprendizagemIdentificadas);
+    }
+    if (contentObj.objetivosCurricularesAdaptados) {
+      if (typeof contentObj.objetivosCurricularesAdaptados === 'object' && !Array.isArray(contentObj.objetivosCurricularesAdaptados)) {
+        const metas = [];
+        if (contentObj.objetivosCurricularesAdaptados.curtoPrazo) {
+          metas.push('--- METAS DE CURTO PRAZO (1 a 2 meses) ---');
+          metas.push(...contentObj.objetivosCurricularesAdaptados.curtoPrazo);
+        }
+        if (contentObj.objetivosCurricularesAdaptados.medioPrazo) {
+          metas.push('--- METAS DE MÉDIO PRAZO (Semestral) ---');
+          metas.push(...contentObj.objetivosCurricularesAdaptados.medioPrazo);
+        }
+        if (contentObj.objetivosCurricularesAdaptados.longoPrazo) {
+          metas.push('--- METAS DE LONGO PRAZO (Ano Letivo) ---');
+          metas.push(...contentObj.objetivosCurricularesAdaptados.longoPrazo);
+        }
+        addSection('4. Metas e Objetivos Curriculares Adaptados', metas);
+      } else {
+        addSection('4. Metas e Objetivos Curriculares Adaptados', contentObj.objetivosCurricularesAdaptados);
+      }
+    }
+    if (contentObj.adaptacoesHabilidadesBNCC && Array.isArray(contentObj.adaptacoesHabilidadesBNCC)) {
+      const habsFormatted = contentObj.adaptacoesHabilidadesBNCC.map(h => 
+        `[${h.code}]: ${h.descricaoBNCC || ''}\n  • Objetivo Flexibilizado: ${h.objetivoAdaptado || ''}\n  • Estratégia em Sala: ${h.estrategiaDidatica || ''}\n  • Recurso de Apoio: ${h.recursoApoio || ''}`
+      );
+      addSection('5. Planejamento de Adaptação por Habilidade da BNCC', habsFormatted);
+    }
+    if (contentObj.estrategiasPedagogicasEspeciais) {
+      addSection('6. Estratégias Pedagógicas & Rotina em Sala de Aula', contentObj.estrategiasPedagogicasEspeciais);
+    }
+    if (contentObj.recursosTecnologiaAssistiva) {
+      addSection('7. Recursos de Tecnologia Assistiva, CAA & Acessibilidade', contentObj.recursosTecnologiaAssistiva);
+    }
+    if (contentObj.planoAtendimentoAEE) {
+      addSection('8. Plano de Atendimento na Sala de Recursos (AEE)', contentObj.planoAtendimentoAEE);
+    }
+    if (contentObj.flexibilizacaoAvaliativa) {
+      addSection('9. Critérios & Flexibilização Avaliativa Processual', contentObj.flexibilizacaoAvaliativa);
+    }
+    if (contentObj.acoesIntegradasFamiliaAEE || contentObj.parceriaFamiliaETerapeutas) {
+      addSection('10. Articulação Escola, Família & Terapeutas', contentObj.acoesIntegradasFamiliaAEE || contentObj.parceriaFamiliaETerapeutas);
+    }
+    if (contentObj.cronogramaRevisaoPEI) {
+      addSection('11. Cronograma de Monitoramento & Revisão Periódica', contentObj.cronogramaRevisaoPEI);
+    }
   } else {
     if (contentObj.objetivoGeral) addSection('1. Objetivo Geral', contentObj.objetivoGeral);
     if (contentObj.objetivosEspecificos) addSection('2. Objetivos Específicos', contentObj.objetivosEspecificos);

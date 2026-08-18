@@ -10,12 +10,13 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
 
   if (!plan) return null;
 
-  const isPei = plan.isPei || plan.type === 'pei';
-  const isSequence = plan.isSequence || plan.type === 'sequence';
-  const isReport = plan.isReport || plan.type === 'report';
-  const isAdaptedActivity = plan.isAdaptedActivity || plan.type === 'adaptedActivity';
-  const isAnnualPlan = plan.isAnnualPlan || plan.type === 'annualPlan';
-  const isInterdisciplinaryProject = plan.isInterdisciplinaryProject || plan.type === 'interdisciplinaryProject';
+  const planType = (plan.type || '').toLowerCase();
+  const isPei = plan.isPei || planType === 'pei';
+  const isSequence = plan.isSequence || planType === 'sequence' || planType === 'didacticsequence';
+  const isReport = plan.isReport || planType === 'report' || planType === 'pedagogicalreport';
+  const isAdaptedActivity = plan.isAdaptedActivity || planType === 'adaptedactivity';
+  const isAnnualPlan = plan.isAnnualPlan || planType === 'annualplan' || planType === 'annualcourseplan';
+  const isInterdisciplinaryProject = plan.isInterdisciplinaryProject || planType === 'interdisciplinaryproject';
   const content = plan.content || plan;
   const editableData = { ...plan, ...content };
 
@@ -636,30 +637,111 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
             </>
           )}
 
-          {/* CONTEÚDO DO PEI */}
+          {/* CONTEÚDO DO PEI COMPLETO E ROBUSTO */}
           {isPei && (
             <>
-              {content.perfilAluno && (
+              {/* 1. Diagnóstico Pedagógico Funcional */}
+              {(content.diagnosticoFuncional || content.perfilAluno) && (
                 <div className="doc-section">
-                  <h3 className="doc-section-title">1. Perfil e Potencialidades do Estudante</h3>
-                  <p className="doc-paragraph">{content.perfilAluno}</p>
+                  <h3 className="doc-section-title">1. Diagnóstico e Avaliação Pedagógica Funcional</h3>
+                  <p className="doc-paragraph">{content.diagnosticoFuncional || content.perfilAluno}</p>
                 </div>
               )}
 
-              {content.objetivosCurricularesAdaptados && (
-                <div className="doc-section">
-                  <h3 className="doc-section-title">2. Objetivos Curriculares Adaptados</h3>
-                  <ul className="doc-list">
-                    {Array.isArray(content.objetivosCurricularesAdaptados)
-                      ? content.objetivosCurricularesAdaptados.map((item, i) => <li key={i}>{item}</li>)
-                      : <li>{content.objetivosCurricularesAdaptados}</li>}
+              {/* 2. Potencialidades e Hiperfocos */}
+              {content.potencialidadesEInteresses && Array.isArray(content.potencialidadesEInteresses) && content.potencialidadesEInteresses.length > 0 && (
+                <div className="doc-section" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '16px' }}>
+                  <h3 className="doc-section-title" style={{ color: '#15803d' }}>⭐ 2. Potencialidades, Interesses & Hiperfocos (Âncoras de Aprendizagem)</h3>
+                  <ul className="doc-list" style={{ color: '#166534' }}>
+                    {content.potencialidadesEInteresses.map((item, i) => <li key={i}>{item}</li>)}
                   </ul>
                 </div>
               )}
 
+              {/* 3. Barreiras de Aprendizagem */}
+              {content.barreirasAprendizagemIdentificadas && Array.isArray(content.barreirasAprendizagemIdentificadas) && content.barreirasAprendizagemIdentificadas.length > 0 && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">3. Barreiras de Acesso ao Currículo Mapeadas</h3>
+                  <ul className="doc-list">
+                    {content.barreirasAprendizagemIdentificadas.map((item, i) => <li key={i}>{item}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {/* 4. Metas e Objetivos Curriculares Adaptados */}
+              {content.objetivosCurricularesAdaptados && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">4. Metas e Objetivos Curriculares Adaptados</h3>
+                  {typeof content.objetivosCurricularesAdaptados === 'object' && !Array.isArray(content.objetivosCurricularesAdaptados) ? (
+                    <div className="doc-steps">
+                      {content.objetivosCurricularesAdaptados.curtoPrazo && (
+                        <div className="step-card mb-3 p-3 border border-indigo-200 rounded-lg bg-indigo-50/40">
+                          <strong className="text-xs font-bold text-indigo-900 block mb-1">🎯 Metas de Curto Prazo (1 a 2 meses):</strong>
+                          <ul className="doc-list text-xs text-slate-700">
+                            {content.objetivosCurricularesAdaptados.curtoPrazo.map((m, i) => <li key={i}>{m}</li>)}
+                          </ul>
+                        </div>
+                      )}
+                      {content.objetivosCurricularesAdaptados.medioPrazo && (
+                        <div className="step-card mb-3 p-3 border border-blue-200 rounded-lg bg-blue-50/40">
+                          <strong className="text-xs font-bold text-blue-900 block mb-1">📈 Metas de Médio Prazo (Semestral):</strong>
+                          <ul className="doc-list text-xs text-slate-700">
+                            {content.objetivosCurricularesAdaptados.medioPrazo.map((m, i) => <li key={i}>{m}</li>)}
+                          </ul>
+                        </div>
+                      )}
+                      {content.objetivosCurricularesAdaptados.longoPrazo && (
+                        <div className="step-card mb-3 p-3 border border-emerald-200 rounded-lg bg-emerald-50/40">
+                          <strong className="text-xs font-bold text-emerald-900 block mb-1">🏆 Metas de Longo Prazo (Ano Letivo):</strong>
+                          <ul className="doc-list text-xs text-slate-700">
+                            {content.objetivosCurricularesAdaptados.longoPrazo.map((m, i) => <li key={i}>{m}</li>)}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <ul className="doc-list">
+                      {Array.isArray(content.objetivosCurricularesAdaptados)
+                        ? content.objetivosCurricularesAdaptados.map((item, i) => <li key={i}>{item}</li>)
+                        : <li>{content.objetivosCurricularesAdaptados}</li>}
+                    </ul>
+                  )}
+                </div>
+              )}
+
+              {/* 5. Adaptação Detalhada por Habilidade da BNCC */}
+              {content.adaptacoesHabilidadesBNCC && Array.isArray(content.adaptacoesHabilidadesBNCC) && content.adaptacoesHabilidadesBNCC.length > 0 && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">5. Planejamento de Adaptação por Habilidade da BNCC</h3>
+                  <div className="doc-steps">
+                    {content.adaptacoesHabilidadesBNCC.map((hab, idx) => (
+                      <div key={idx} className="step-card mb-4 p-4 border border-rose-200 rounded-lg bg-rose-50/20">
+                        <div className="step-header mb-2 flex items-center justify-between">
+                          <span className="step-title font-bold text-rose-900 text-sm">
+                            📌 {hab.code}: {hab.descricaoBNCC || ''}
+                          </span>
+                        </div>
+                        <p className="step-desc text-xs text-slate-800 mt-1">
+                          <strong>🎯 Objetivo Flexibilizado:</strong> {hab.objetivoAdaptado}
+                        </p>
+                        <p className="step-desc text-xs text-slate-700 mt-1">
+                          <strong>👩‍🏫 Estratégia Didática em Sala:</strong> {hab.estrategiaDidatica}
+                        </p>
+                        {hab.recursoApoio && (
+                          <p className="step-desc text-xs text-rose-700 mt-1">
+                            <strong>🛠️ Recurso / Suporte de Apoio:</strong> {hab.recursoApoio}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 6. Estratégias Pedagógicas Especiais na Sala Regular */}
               {content.estrategiasPedagogicasEspeciais && (
                 <div className="doc-section">
-                  <h3 className="doc-section-title">3. Estratégias Pedagógicas Diferenciadas</h3>
+                  <h3 className="doc-section-title">6. Estratégias Pedagógicas & Rotina em Sala de Aula</h3>
                   <ul className="doc-list">
                     {Array.isArray(content.estrategiasPedagogicasEspeciais)
                       ? content.estrategiasPedagogicasEspeciais.map((item, i) => <li key={i}>{item}</li>)
@@ -668,9 +750,10 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                 </div>
               )}
 
+              {/* 7. Tecnologia Assistiva e Acessibilidade */}
               {content.recursosTecnologiaAssistiva && (
                 <div className="doc-section">
-                  <h3 className="doc-section-title">4. Recursos de Acessibilidade e Tecnologia Assistiva</h3>
+                  <h3 className="doc-section-title">7. Recursos de Tecnologia Assistiva, CAA & Acessibilidade</h3>
                   <ul className="doc-list">
                     {Array.isArray(content.recursosTecnologiaAssistiva)
                       ? content.recursosTecnologiaAssistiva.map((item, i) => <li key={i}>{item}</li>)
@@ -679,17 +762,35 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                 </div>
               )}
 
+              {/* 8. Plano de Atendimento no AEE */}
+              {content.planoAtendimentoAEE && (
+                <div className="doc-section" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px' }}>
+                  <h3 className="doc-section-title" style={{ color: '#0f172a' }}>8. Plano de Atendimento na Sala de Recursos (AEE)</h3>
+                  <p className="doc-paragraph text-slate-700">{content.planoAtendimentoAEE}</p>
+                </div>
+              )}
+
+              {/* 9. Flexibilização Avaliativa */}
               {content.flexibilizacaoAvaliativa && (
                 <div className="doc-section">
-                  <h3 className="doc-section-title">5. Critérios e Flexibilização Avaliativa</h3>
+                  <h3 className="doc-section-title">9. Critérios & Flexibilização Avaliativa Processual</h3>
                   <p className="doc-paragraph">{content.flexibilizacaoAvaliativa}</p>
                 </div>
               )}
 
-              {content.acoesIntegradasFamiliaAEE && (
+              {/* 10. Ações Integradas com a Família e Terapeutas */}
+              {(content.acoesIntegradasFamiliaAEE || content.parceriaFamiliaETerapeutas) && (
                 <div className="doc-section doc-section-highlight">
-                  <h3 className="doc-section-title">6. Parceria Família & Equipe de AEE</h3>
-                  <p className="doc-paragraph">{content.acoesIntegradasFamiliaAEE}</p>
+                  <h3 className="doc-section-title">10. Articulação Escola, Família & Terapeutas</h3>
+                  <p className="doc-paragraph">{content.acoesIntegradasFamiliaAEE || content.parceriaFamiliaETerapeutas}</p>
+                </div>
+              )}
+
+              {/* 11. Cronograma de Revisão */}
+              {content.cronogramaRevisaoPEI && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">11. Cronograma de Monitoramento & Revisão Periódica</h3>
+                  <p className="doc-paragraph text-slate-600 font-medium text-xs">{content.cronogramaRevisaoPEI}</p>
                 </div>
               )}
             </>
