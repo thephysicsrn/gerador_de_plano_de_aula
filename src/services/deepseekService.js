@@ -506,8 +506,14 @@ Analise CUIDADOSAMENTE cada questão da atividade original, identifique seus tip
 
     return parsed;
   } catch (err) {
+    // Se o erro for apenas "sem API key" → usa o gerador nativo gratuito silenciosamente
+    const isNoKeyError = err.message?.includes('Nenhuma Chave de API');
+    if (isNoKeyError) {
+      console.info('Sem API key configurada — usando gerador pedagógico nativo.');
+      return generateMockAdaptedActivity(formData);
+    }
+    // Outros erros (JSON inválido, saldo insuficiente, timeout etc.) → mostra ao usuário
     console.error('Erro ao gerar atividade adaptada com IA:', err);
-    // Relança o erro para que o handler no App.jsx possa exibir ao usuário
     throw err;
   }
 }
