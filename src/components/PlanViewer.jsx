@@ -14,6 +14,8 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
   const isSequence = plan.isSequence || plan.type === 'sequence';
   const isReport = plan.isReport || plan.type === 'report';
   const isAdaptedActivity = plan.isAdaptedActivity || plan.type === 'adaptedActivity';
+  const isAnnualPlan = plan.isAnnualPlan || plan.type === 'annualPlan';
+  const isInterdisciplinaryProject = plan.isInterdisciplinaryProject || plan.type === 'interdisciplinaryProject';
   const content = plan.content || plan;
   const editableData = { ...plan, ...content };
 
@@ -45,9 +47,9 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
   const handlePdfExport = async () => {
     setIsExporting(true);
     try {
-      const rawTitle = content.titulo || content.tituloRelatorio || content.tituloAtividade || editableData.conteudoProgramatico || editableData.nomeAluno || 'Documento';
+      const rawTitle = content.titulo || content.tituloRelatorio || content.tituloAtividade || content.tituloPlanoAnual || content.tituloProjeto || editableData.conteudoProgramatico || editableData.nomeAluno || 'Documento';
       const cleanTitle = rawTitle.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '_').replace(/_+/g, '_');
-      const prefix = isPei ? 'PEI' : (isSequence ? 'Sequencia' : (isReport ? 'Relatorio' : (isAdaptedActivity ? 'Atividade_Adaptada' : 'Plano_Aula')));
+      const prefix = isPei ? 'PEI' : (isSequence ? 'Sequencia' : (isReport ? 'Relatorio' : (isAdaptedActivity ? 'Atividade_Adaptada' : (isAnnualPlan ? 'Plano_Anual' : (isInterdisciplinaryProject ? 'Projeto_Integrador' : 'Plano_Aula')))));
       const filename = `${prefix}_${cleanTitle}.pdf`;
       await exportToPdf('a4-document-paper', filename);
     } catch (err) {
@@ -105,21 +107,65 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
               {isSequence && 'SEQUÊNCIA DIDÁTICA ENCADEDA'}
               {isReport && 'RELATÓRIO PEDAGÓGICO & PARECER DESCRITIVO'}
               {isAdaptedActivity && 'ATIVIDADE ADAPTADA — EDUCAÇÃO INCLUSIVA AEE'}
-              {!isPei && !isSequence && !isReport && !isAdaptedActivity && 'PLANO DE AULA / MATRIZ PEDAGÓGICA'}
+              {isAnnualPlan && 'PLANO DE CURSO ANUAL & EMENTA BIMESTRAL'}
+              {isInterdisciplinaryProject && 'PROJETO INTERDISCIPLINAR & INTEGRADOR'}
+              {!isPei && !isSequence && !isReport && !isAdaptedActivity && !isAnnualPlan && !isInterdisciplinaryProject && 'PLANO DE AULA / MATRIZ PEDAGÓGICA'}
             </div>
             <h1 className="doc-title">
               {isPei && `PEI: ${editableData.nomeAluno || 'Estudante'}`}
               {isSequence && (content.titulo || `Sequência Didática - ${editableData.disciplina}`)}
               {isReport && (content.tituloRelatorio || `Relatório Pedagógico - ${editableData.nomeAluno}`)}
               {isAdaptedActivity && (content.tituloAtividade || `Atividade Adaptada - ${editableData.disciplina}`)}
-              {!isPei && !isSequence && !isReport && !isAdaptedActivity && (content.titulo || `Plano de Aula - ${editableData.disciplina}`)}
+              {isAnnualPlan && (content.tituloPlanoAnual || `Plano de Curso Anual - ${editableData.disciplina}`)}
+              {isInterdisciplinaryProject && (content.tituloProjeto || `Projeto Integrador - ${editableData.disciplinaPrincipal}`)}
+              {!isPei && !isSequence && !isReport && !isAdaptedActivity && !isAnnualPlan && !isInterdisciplinaryProject && (content.titulo || `Plano de Aula - ${editableData.disciplina}`)}
             </h1>
             <p className="doc-subtitle">Base Curricular & Diretrizes Nacionais de Educação (MEC / BNCC / SESI)</p>
           </div>
 
           {/* Tabela de Metadados */}
           <div className="doc-meta-grid">
-            {isAdaptedActivity ? (
+            {isAnnualPlan ? (
+              <>
+                <div className="meta-item">
+                  <span className="meta-label">Componente Curricular:</span>
+                  <span className="meta-value">{editableData.disciplina}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Série / Ano:</span>
+                  <span className="meta-value">{editableData.anoSerie}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Carga Horária:</span>
+                  <span className="meta-value">{editableData.cargaHoraria}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Divisão:</span>
+                  <span className="meta-value font-semibold text-blue-700">{editableData.divisaoPeriodo}</span>
+                </div>
+              </>
+            ) : isInterdisciplinaryProject ? (
+              <>
+                <div className="meta-item">
+                  <span className="meta-label">Disciplina Principal:</span>
+                  <span className="meta-value font-semibold">{editableData.disciplinaPrincipal}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Disciplinas Integradas:</span>
+                  <span className="meta-value text-emerald-700">
+                    {Array.isArray(editableData.disciplinasSecundarias) ? editableData.disciplinasSecundarias.join(', ') : editableData.disciplinasSecundarias}
+                  </span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Série / Ano:</span>
+                  <span className="meta-value">{editableData.anoSerie}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Produto Final:</span>
+                  <span className="meta-value font-semibold">{editableData.produtoFinal}</span>
+                </div>
+              </>
+            ) : isAdaptedActivity ? (
               <>
                 <div className="meta-item">
                   <span className="meta-label">Componente Curricular:</span>
@@ -387,8 +433,105 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
             </>
           )}
 
+          {/* CONTEÚDO DO PLANO DE CURSO ANUAL / BIMESTRAL */}
+          {isAnnualPlan && (
+            <>
+              {content.ementaGeral && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">1. Ementa Geral do Curso</h3>
+                  <p className="doc-paragraph">{content.ementaGeral}</p>
+                </div>
+              )}
+
+              {content.objetivosAnuais && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">2. Objetivos Gerais do Ano Letivo</h3>
+                  <ul className="doc-list">
+                    {Array.isArray(content.objetivosAnuais)
+                      ? content.objetivosAnuais.map((obj, i) => <li key={i}>{obj}</li>)
+                      : <li>{content.objetivosAnuais}</li>}
+                  </ul>
+                </div>
+              )}
+
+              {content.distribuicaoBimestral && Array.isArray(content.distribuicaoBimestral) && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">3. Distribuição Curricular por Período Letivo</h3>
+                  <div className="doc-steps">
+                    {content.distribuicaoBimestral.map((per, idx) => (
+                      <div key={idx} className="step-card mb-4 p-4 border border-blue-200 rounded-lg bg-blue-50/30">
+                        <div className="step-header mb-2 flex items-center justify-between">
+                          <span className="step-title font-bold text-blue-900 text-base">{per.bimestre}: {per.unidadeTematica}</span>
+                        </div>
+                        {per.conteudosEssenciais && (
+                          <div className="mb-2">
+                            <strong className="text-xs text-blue-800 block mb-1">Conteúdos Essenciais:</strong>
+                            <ul className="doc-list text-xs text-slate-700">
+                              {Array.isArray(per.conteudosEssenciais) 
+                                ? per.conteudosEssenciais.map((c, i) => <li key={i}>{c}</li>)
+                                : <li>{per.conteudosEssenciais}</li>}
+                            </ul>
+                          </div>
+                        )}
+                        <p className="step-desc text-xs text-slate-700 mt-2"><strong>Metodologia:</strong> {per.metodologiaErecursos}</p>
+                        <p className="step-desc text-xs text-slate-700 mt-1"><strong>Avaliação:</strong> {per.avaliacaoPeriodo}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* CONTEÚDO DO PROJETO INTERDISCIPLINAR / INTEGRADOR */}
+          {isInterdisciplinaryProject && (
+            <>
+              {content.perguntaDisparadora && (
+                <div className="doc-section doc-section-highlight">
+                  <h3 className="doc-section-title">1. Pergunta Disparadora / Desafio do Projeto</h3>
+                  <p className="doc-paragraph font-bold text-slate-800 text-base">{content.perguntaDisparadora}</p>
+                </div>
+              )}
+
+              {content.justificativaEDisciplinas && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">2. Justificativa & Articulação Curricular</h3>
+                  <p className="doc-paragraph">{content.justificativaEDisciplinas}</p>
+                </div>
+              )}
+
+              {content.cronogramaEtapas && Array.isArray(content.cronogramaEtapas) && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">3. Cronograma de Etapas do Projeto</h3>
+                  <div className="doc-steps">
+                    {content.cronogramaEtapas.map((et, idx) => (
+                      <div key={idx} className="step-card mb-3 p-3 border border-emerald-200 rounded-lg">
+                        <div className="step-header mb-1">
+                          <span className="step-title font-bold text-emerald-900">{et.etapaNumero}: {et.nomeEtapa}</span>
+                        </div>
+                        <p className="step-desc text-xs text-slate-700">{et.descricaoAcoes}</p>
+                        <p className="step-desc text-xs text-emerald-700 mt-1"><strong>Responsabilidade:</strong> {et.responsavelDisciplina}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {content.criteriosAvaliacaoConjunta && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">4. Critérios de Avaliação Conjunta</h3>
+                  <ul className="doc-list">
+                    {Array.isArray(content.criteriosAvaliacaoConjunta)
+                      ? content.criteriosAvaliacaoConjunta.map((crit, i) => <li key={i}>{crit}</li>)
+                      : <li>{content.criteriosAvaliacaoConjunta}</li>}
+                  </ul>
+                </div>
+              )}
+            </>
+          )}
+
           {/* CONTEÚDO DO PLANO DE AULA PADRÃO */}
-          {!isPei && !isSequence && !isReport && !isAdaptedActivity && (
+          {!isPei && !isSequence && !isReport && !isAdaptedActivity && !isAnnualPlan && !isInterdisciplinaryProject && (
             <>
               {content.objetivoGeral && (
                 <div className="doc-section">

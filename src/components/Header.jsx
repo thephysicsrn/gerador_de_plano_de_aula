@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, FileText, HeartHandshake, Database, BookmarkCheck, Sparkles, Sun, Moon, LogOut, User, Building2, ChevronDown, Layers, UserCheck, Accessibility } from 'lucide-react';
+import { Home, FileText, HeartHandshake, Database, BookmarkCheck, Sparkles, Sun, Moon, LogOut, User, Building2, ChevronDown, Layers, UserCheck, Accessibility, Calendar, Network } from 'lucide-react';
 
 export default function Header({ activeTab, setActiveTab, darkMode, setDarkMode, onOpenApiKeyModal, user, onLogout, onToggleRedeEnsino }) {
   const isSesi = user?.redeEnsino === 'REDE_SESI';
@@ -47,6 +47,22 @@ export default function Header({ activeTab, setActiveTab, darkMode, setDarkMode,
           </button>
 
           <button
+            className={`nav-link-podia ${activeTab === 'annual-plan' ? 'active' : ''}`}
+            onClick={() => setActiveTab('annual-plan')}
+          >
+            <Calendar className="w-4 h-4 mr-1.5 shrink-0 text-blue-500" />
+            <span>Plano Anual</span>
+          </button>
+
+          <button
+            className={`nav-link-podia ${activeTab === 'interdisciplinary-project' ? 'active' : ''}`}
+            onClick={() => setActiveTab('interdisciplinary-project')}
+          >
+            <Network className="w-4 h-4 mr-1.5 shrink-0 text-emerald-500" />
+            <span>Projeto Integrador</span>
+          </button>
+
+          <button
             className={`nav-link-podia ${activeTab === 'sequence' ? 'active' : ''}`}
             onClick={() => setActiveTab('sequence')}
           >
@@ -83,7 +99,7 @@ export default function Header({ activeTab, setActiveTab, darkMode, setDarkMode,
             onClick={() => setActiveTab('bncc')}
           >
             <Database className="w-4 h-4 mr-1.5 shrink-0" />
-            <span>Base BNCC</span>
+            <span>BNCC</span>
           </button>
 
           <button

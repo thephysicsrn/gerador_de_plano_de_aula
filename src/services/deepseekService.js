@@ -424,4 +424,151 @@ export function generateMockAdaptedActivity(formData) {
   };
 }
 
+/**
+ * Geração de Plano de Curso Anual / Bimestral com IA
+ */
+export async function generateAnnualCoursePlanWithAI(formData, apiKey = '') {
+  try {
+    const promptSystem = `Você é um doutor em Gestão Curricular e Didática da Educação Básica. Crie um Plano de Curso Anual completo distribuído por Bimestres Letivos. Retorne um JSON válido com a seguinte estrutura: { "tituloPlanoAnual": "", "ementaGeral": "", "objetivosAnuais": [], "distribuicaoBimestral": [ { "bimestre": "1º Bimestre", "unidadeTematica": "", "habilidadesAlvo": [ { "code": "", "descricao": "" } ], "conteudosEssenciais": [], "metodologiaErecursos": "", "avaliacaoPeriodo": "" } ], "referenciasErecursos": "" }`;
+    const promptUser = `Gere o plano de curso anual para ${formData.disciplina} (${formData.anoSerie}). Carga horária: ${formData.cargaHoraria}. Divisão: ${formData.divisaoPeriodo}. Foco: ${formData.focoPedagogico || 'Geral'}. Observações: ${formData.observacoes || 'Nenhuma'}.`;
+    const rawResult = await callDeepSeekAPI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }], apiKey);
+    const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+    return JSON.parse(cleanJsonText);
+  } catch (err) {
+    return generateMockAnnualCoursePlan(formData);
+  }
+}
+
+export function generateMockAnnualCoursePlan(formData) {
+  const { disciplina, anoSerie, cargaHoraria, divisaoPeriodo } = formData;
+  return {
+    tituloPlanoAnual: `Plano de Curso Anual: ${disciplina || 'Componente Curricular'} — ${anoSerie || 'Ensino Fundamental'}`,
+    ementaGeral: `Desenvolvimento anual das competências específicas e habilidades do componente de ${disciplina} para o ${anoSerie}, articulando conceitos fundamentais, investigação prática e autonomia dos estudantes ao longo de ${cargaHoraria || '80h'}.`,
+    objetivosAnuais: [
+      `Mobilizar os conceitos centrais da disciplina na solução de problemas reais do cotidiano.`,
+      `Desenvolver o pensamento crítico, a argumentação fundamentada e a investigação científica.`,
+      `Fortalecer a autonomia de estudo e o trabalho colaborativo durante os ${divisaoPeriodo || '4 bimestres'}.`
+    ],
+    distribuicaoBimestral: [
+      {
+        bimestre: "1º Bimestre",
+        unidadeTematica: "Fundamentos, Conceitos Iniciais e Problematização",
+        habilidadesAlvo: [
+          { code: "BNCC/SESI.01", descricao: "Reconhecer e conceituar os princípios fundamentais da unidade." }
+        ],
+        conteudosEssenciais: [
+          "Introdução histórica e conceitual da disciplina",
+          "Mapeamento de conhecimentos prévios e terminologia científica",
+          "Resolução de situações-problema introdutórias"
+        ],
+        metodologiaErecursos: "Aulas expositivas dialogadas com suporte de mapas conceituais e estudos em duplas.",
+        avaliacaoPeriodo: "Avaliação diagnóstica inicial, participação nas discussões e primeira prova escrita."
+      },
+      {
+        bimestre: "2º Bimestre",
+        unidadeTematica: "Aprofundamento Teórico e Análise Sistemática",
+        habilidadesAlvo: [
+          { code: "BNCC/SESI.02", descricao: "Analisar e relacionar variáveis em processos e fenômenos complexos." }
+        ],
+        conteudosEssenciais: [
+          "Leis e princípios estruturantes do conteúdo",
+          "Análise de tabelas, gráficos e dados estatísticos",
+          "Exercícios de aplicação prática e estudos de caso"
+        ],
+        metodologiaErecursos: "Sala de aula invertida e resolução colaborativa de listas de exercícios.",
+        avaliacaoPeriodo: "Relatório de acompanhamento, prova bimestral e autoavaliação do aluno."
+      },
+      {
+        bimestre: "3º Bimestre",
+        unidadeTematica: "Aplicação Prática e Investigação Científica",
+        habilidadesAlvo: [
+          { code: "BNCC/SESI.03", descricao: "Aplicar conhecimentos na construção de hipóteses e experimentos." }
+        ],
+        conteudosEssenciais: [
+          "Experimentos de laboratório / simulações digitais",
+          "Coleta de dados e elaboração de relatórios investigativos",
+          "Conexões tecnológicas e sociais do tema"
+        ],
+        metodologiaErecursos: "Aprendizagem baseada em problemas (PBL) e experimentos em pequenos grupos.",
+        avaliacaoPeriodo: "Avaliação do relatório experimental, seminário em equipe e prova bimestral."
+      },
+      {
+        bimestre: "4º Bimestre",
+        unidadeTematica: "Síntese Curricular e Projeto Integrador Final",
+        habilidadesAlvo: [
+          { code: "BNCC/SESI.04", descricao: "Sintetizar e comunicar as aprendizagens consolidadas ao longo do ano." }
+        ],
+        conteudosEssenciais: [
+          "Revisão integradora dos temas centrais do ano",
+          "Desenvolvimento e apresentação do projeto final da disciplina",
+          "Avaliação somativa geral de fechamento de ciclo"
+        ],
+        metodologiaErecursos: "Rotação por estações de revisão e feira de apresentação dos projetos dos alunos.",
+        avaliacaoPeriodo: "Apresentação do produto final, prova acumulativa de encerramento de ciclo e conselho de classe."
+      }
+    ],
+    referenciasErecursos: "Base Nacional Comum Curricular (BNCC - MEC); Matrizes Curriculares Padronizadas da Rede SESI; Livro Didático Adotado; Plataformas Digitais de Simulação."
+  };
+}
+
+/**
+ * Geração de Projeto Interdisciplinar / Integrador com IA
+ */
+export async function generateInterdisciplinaryProjectWithAI(formData, apiKey = '') {
+  try {
+    const promptSystem = `Você é um especialista em Projetos Integradores e Aprendizagem Baseada em Projetos (PBL). Crie um Projeto Interdisciplinar completo. Retorne um JSON válido com: { "tituloProjeto": "", "perguntaDisparadora": "", "disciplinasEnvolvidas": [], "produtoFinal": "", "justificativaEDisciplinas": "", "cronogramaEtapas": [ { "etapaNumero": "Etapa 1", "nomeEtapa": "", "descricaoAcoes": "", "responsavelDisciplina": "" } ], "criteriosAvaliacaoConjunta": [], "recursosEParcerias": "" }`;
+    const promptUser = `Projeto para ${formData.disciplinaPrincipal} integrada com ${formData.disciplinasSecundarias.join(', ')} (${formData.anoSerie}). Tema: ${formData.temaProjeto}. Duração: ${formData.duracaoProjeto}. Produto Final: ${formData.produtoFinal}. Observações: ${formData.observacoes || 'Nenhuma'}.`;
+    const rawResult = await callDeepSeekAPI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }], apiKey);
+    const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+    return JSON.parse(cleanJsonText);
+  } catch (err) {
+    return generateMockInterdisciplinaryProject(formData);
+  }
+}
+
+export function generateMockInterdisciplinaryProject(formData) {
+  const { disciplinaPrincipal, disciplinasSecundarias, anoSerie, temaProjeto, duracaoProjeto, produtoFinal } = formData;
+  const todasDisciplinas = [disciplinaPrincipal, ...(disciplinasSecundarias || [])];
+  return {
+    tituloProjeto: `Projeto Integrador: ${temaProjeto || 'Investigação Interdisciplinar'}`,
+    perguntaDisparadora: `Como os conceitos de ${todasDisciplinas.join(', ')} se conectam para resolver o desafio de "${temaProjeto || 'nossa comunidade'}"?`,
+    disciplinasEnvolvidas: todasDisciplinas,
+    produtoFinal: produtoFinal || 'Apresentação de Protótipo e Feira de Conhecimentos',
+    justificativaEDisciplinas: `Este projeto interdisciplinar articula as competências de ${todasDisciplinas.join(', ')} para a ª1ª Série do Ensino Médio, estimulando o protagonismo dos estudantes através do desenvolvimento de ${produtoFinal || 'um produto autoral'} ao longo de ${duracaoProjeto || '3 semanas'}.`,
+    cronogramaEtapas: [
+      {
+        etapaNumero: "Etapa 1 — Sensibilização e Lançamento do Desafio",
+        nomeEtapa: "Formação de Equipes e Pergunta Disparadora",
+        descricaoAcoes: `Apresentação da situação-problema aos estudantes. Divisão das equipes de 4 a 5 alunos e distribuição dos papéis (Líder, Pesquisador, Designer e Relator).`,
+        responsavelDisciplina: `Mediação conjunta: ${disciplinaPrincipal} e ${disciplinasSecundarias[0] || 'Parceiros'}`
+      },
+      {
+        etapaNumero: "Etapa 2 — Pesquisa de Campo e Investigação Científica",
+        nomeEtapa: "Coleta de Dados e Fundamentação Teórica",
+        descricaoAcoes: `Os grupos realizam levantamento bibliográfico, experimentos de laboratório e entrevistas de campo para embasar o projeto.`,
+        responsavelDisciplina: `Foco técnico em ${disciplinaPrincipal}`
+      },
+      {
+        etapaNumero: "Etapa 3 — Desenvolvimento e Mão na Massa (Maker)",
+        nomeEtapa: "Construção do Protótipo / Produto Final",
+        descricaoAcoes: `Sessões de mentoria com os professores para montagem do produto final (${produtoFinal}), testes de funcionamento e ajustes de design.`,
+        responsavelDisciplina: `Mediação conjunta de todas as disciplinas envolvidas`
+      },
+      {
+        etapaNumero: "Etapa 4 — Mostra Cultural / Feira & Avaliação",
+        nomeEtapa: "Apresentação Pública e Autoavaliação",
+        descricaoAcoes: `Exposição do produto final para a comunidade escolar com bancada de avaliação e aplicação da rubrica de desempenho.`,
+        responsavelDisciplina: `Banca de professores avaliadores`
+      }
+    ],
+    criteriosAvaliacaoConjunta: [
+      'Domínio dos conceitos científicos integrados das disciplinas parceiras',
+      'Qualidade técnica, criatividade e acabamento do produto final',
+      'Capacidade de comunicação, trabalho em equipe e defesa de hipóteses no pitch'
+    ],
+    recursosEParcerias: `Dispositivos com acesso à internet, materiais de prototipagem (cartolina, cola, sensores ou recicláveis), espaço maker da escola e auditório para apresentações.`
+  };
+}
+
+
 

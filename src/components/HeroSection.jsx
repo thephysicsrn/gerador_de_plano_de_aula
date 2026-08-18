@@ -1,17 +1,28 @@
 import React from 'react';
-import { FileText, HeartHandshake, Database, ArrowRight, Layers, UserCheck } from 'lucide-react';
+import { Sparkles, FileText, HeartHandshake, ArrowRight, Layers, UserCheck, Calendar, Network } from 'lucide-react';
 
 export default function HeroSection({ onSelectTab }) {
   return (
-    <section className="hero-podia-section animate-fade-in">
-      {/* Título Principal */}
-      <div className="hero-podia-header">
-        <h1 className="hero-podia-title">
-          Edu.Plan — O estúdio completo para seus planejamentos e documentos pedagógicos
+    <section className="hero-section-podia animate-fade-in">
+      <div className="hero-content-podia">
+        {/* Pill Badge */}
+        <div className="hero-pill-podia">
+          <Sparkles className="w-3.5 h-3.5 mr-1.5 text-amber-500 shrink-0" />
+          <span>Inteligência Artificial Integrada à BNCC & Matrizes SESI</span>
+        </div>
+
+        {/* Título Principal Estilo Podia */}
+        <h1 className="hero-title-podia">
+          Crie tudo para sua aula. <br />
+          <span className="hero-title-highlight">Em segundos, não horas.</span>
         </h1>
-        <p className="hero-podia-subtitle">
-          Crie planos de aula, sequências didáticas encadeadas, relatórios descritivos e PEIs inclusivos em segundos com Inteligência Artificial.
+
+        {/* Subtítulo */}
+        <p className="hero-subtitle-podia">
+          Planos de aula, sequências didáticas, PEIs inclusivos, atividades adaptadas com upload, relatórios de alunos, planos de curso anuais e projetos integradores em um só lugar.
         </p>
+
+        {/* Botão de Ação Direta */}
         <div className="hero-cta-group">
           <button className="btn-podia-hero-black" onClick={() => onSelectTab('lesson-plan')}>
             <span>Criar Plano de Aula Agora</span>
@@ -20,8 +31,8 @@ export default function HeroSection({ onSelectTab }) {
         </div>
       </div>
 
-      {/* Grid com os Cards de Ação Rápidos da Podia */}
-      <div className="podia-cards-grid">
+      {/* Grid de Cards de Recursos */}
+      <div className="hero-features-grid-podia">
         {/* CARD 1: PLANO DE AULA (AZUL PASTEL) */}
         <div
           className="podia-feature-card card-blue"
@@ -41,7 +52,45 @@ export default function HeroSection({ onSelectTab }) {
           </div>
         </div>
 
-        {/* CARD 2: SEQUÊNCIA DIDÁTICA (ROXO PASTEL) */}
+        {/* CARD 2: PLANO DE CURSO ANUAL (AZUL CLARO) */}
+        <div
+          className="podia-feature-card card-blue-subtle"
+          onClick={() => onSelectTab('annual-plan')}
+        >
+          <div className="card-top">
+            <span className="card-tag">Plano de Curso Anual ›</span>
+            <p className="card-desc">
+              Mapeie e distribua todas as 570+ habilidades e conteúdos ao longo dos 4 bimestres do ano.
+            </p>
+          </div>
+          <div className="card-bottom">
+            <div className="card-mock-ui">
+              <Calendar className="w-5 h-5 mr-2 shrink-0" />
+              <span>Ementa dos 4 Bimestres</span>
+            </div>
+          </div>
+        </div>
+
+        {/* CARD 3: PROJETO INTEGRADOR (VERDE ESCURO) */}
+        <div
+          className="podia-feature-card card-emerald"
+          onClick={() => onSelectTab('interdisciplinary-project')}
+        >
+          <div className="card-top">
+            <span className="card-tag">Projeto Integrador ›</span>
+            <p className="card-desc">
+              Conecte 2 ou mais matérias com pergunta disparadora, cronograma maker e produto final.
+            </p>
+          </div>
+          <div className="card-bottom">
+            <div className="card-mock-ui">
+              <Network className="w-5 h-5 mr-2 shrink-0" />
+              <span>Interdisciplinaridade</span>
+            </div>
+          </div>
+        </div>
+
+        {/* CARD 4: SEQUÊNCIA DIDÁTICA (ROXO PASTEL) */}
         <div
           className="podia-feature-card card-purple"
           onClick={() => onSelectTab('sequence')}
@@ -60,7 +109,7 @@ export default function HeroSection({ onSelectTab }) {
           </div>
         </div>
 
-        {/* CARD 3: PEI INCLUSIVO (OCRE/DOURO PASTEL) */}
+        {/* CARD 5: PEI INCLUSIVO (OCRE/DOURO PASTEL) */}
         <div
           className="podia-feature-card card-ochre"
           onClick={() => onSelectTab('pei')}
@@ -79,7 +128,7 @@ export default function HeroSection({ onSelectTab }) {
           </div>
         </div>
 
-        {/* CARD 4: RELATÓRIO PEDAGÓGICO (VERDE PASTEL) */}
+        {/* CARD 6: RELATÓRIO PEDAGÓGICO (VERDE PASTEL) */}
         <div
           className="podia-feature-card card-teal"
           onClick={() => onSelectTab('report')}

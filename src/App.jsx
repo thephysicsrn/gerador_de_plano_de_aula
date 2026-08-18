@@ -7,6 +7,8 @@ import PeiForm from './components/PeiForm';
 import DidacticSequenceForm from './components/DidacticSequenceForm';
 import PedagogicalReportForm from './components/PedagogicalReportForm';
 import AdaptedActivityForm from './components/AdaptedActivityForm';
+import AnnualCoursePlanForm from './components/AnnualCoursePlanForm';
+import InterdisciplinaryProjectForm from './components/InterdisciplinaryProjectForm';
 import PlanViewer from './components/PlanViewer';
 import BnccExplorer from './components/BnccExplorer';
 import SavedPlansList from './components/SavedPlansList';
@@ -20,11 +22,15 @@ import {
   generateDidacticSequenceWithAI,
   generatePedagogicalReportWithAI,
   generateAdaptedActivityWithAI,
+  generateAnnualCoursePlanWithAI,
+  generateInterdisciplinaryProjectWithAI,
   generateMockLessonPlan, 
   generateMockPei,
   generateMockDidacticSequence,
   generateMockPedagogicalReport,
-  generateMockAdaptedActivity
+  generateMockAdaptedActivity,
+  generateMockAnnualCoursePlan,
+  generateMockInterdisciplinaryProject
 } from './services/deepseekService';
 import { getStoredApiKey } from './utils/storage';
 import { getStoredSessionUser, logoutUser, auth, updateUserRedeEnsino } from './services/firebaseService';
@@ -198,6 +204,52 @@ export default function App() {
     }
   };
 
+  // Handler de Geração de Plano de Curso Anual
+  const handleGenerateAnnualCoursePlan = async (formData, useAi = true) => {
+    setIsLoading(true);
+    try {
+      let result;
+      if (useAi && getStoredApiKey()) {
+        result = await generateAnnualCoursePlanWithAI(formData);
+      } else {
+        result = generateMockAnnualCoursePlan(formData);
+      }
+
+      setGeneratedPlan({
+        ...formData,
+        content: result
+      });
+    } catch (err) {
+      console.error('Erro na geração do Plano Anual:', err);
+      alert(err.message || 'Erro ao gerar o Plano Anual.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handler de Geração de Projeto Interdisciplinar
+  const handleGenerateInterdisciplinaryProject = async (formData, useAi = true) => {
+    setIsLoading(true);
+    try {
+      let result;
+      if (useAi && getStoredApiKey()) {
+        result = await generateInterdisciplinaryProjectWithAI(formData);
+      } else {
+        result = generateMockInterdisciplinaryProject(formData);
+      }
+
+      setGeneratedPlan({
+        ...formData,
+        content: result
+      });
+    } catch (err) {
+      console.error('Erro na geração do Projeto Integrador:', err);
+      alert(err.message || 'Erro ao gerar o Projeto Integrador.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Selecionar plano do histórico
   const handleSelectSavedPlan = (plan) => {
     setGeneratedPlan(plan);
@@ -262,6 +314,20 @@ export default function App() {
                 apiKeyConfigured={apiKeyConfigured}
                 onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
                 user={user}
+              />
+            )}
+
+            {activeTab === 'annual-plan' && (
+              <AnnualCoursePlanForm
+                onGenerate={handleGenerateAnnualCoursePlan}
+                isLoading={isLoading}
+              />
+            )}
+
+            {activeTab === 'interdisciplinary-project' && (
+              <InterdisciplinaryProjectForm
+                onGenerate={handleGenerateInterdisciplinaryProject}
+                isLoading={isLoading}
               />
             )}
 
