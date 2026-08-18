@@ -491,6 +491,41 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-block;
 }
 
+.mega-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 540px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.mega-menu-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mega-menu-heading {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-left: 0.5rem;
+}
+
 .nav-dropdown-menu {
   position: absolute;
   top: calc(100% + 8px);
