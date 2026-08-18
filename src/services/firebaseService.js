@@ -268,10 +268,15 @@ export async function signInWithGoogle(redeEnsino = 'REDE_SESI') {
 }
 
 /**
- * Autenticação Social com Microsoft (Outlook / Office 365 / Entra ID)
+ * Autenticação Social com Microsoft (Outlook / Office 365 / Hotmail / Entra ID)
  */
 export async function signInWithMicrosoft(redeEnsino = 'REDE_SESI') {
   const provider = new OAuthProvider('microsoft.com');
+  provider.setCustomParameters({
+    prompt: 'select_account',
+    tenant: 'common'
+  });
+
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
