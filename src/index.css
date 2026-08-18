@@ -3041,4 +3041,43 @@ body.dark-mode .preview-tab-btn.active {
   align-items: center;
 }
 
+/* CHIPS DE SELEÇÃO DE DISCIPLINAS INTEGRADAS */
+.btn-tag-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 9999px;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text-main);
+  background-color: var(--bg-card-subtle);
+  border: 1.5px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+  user-select: none;
+}
+
+.btn-tag-select:hover {
+  background-color: var(--border-color);
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.btn-tag-select.selected {
+  background-color: #ecfdf5;
+  border-color: #10b981;
+  color: #047857;
+  font-weight: 700;
+  box-shadow: 0 2px 5px rgba(16, 185, 129, 0.15);
+}
+
+.dark .btn-tag-select.selected {
+  background-color: rgba(6, 78, 59, 0.4);
+  border-color: #10b981;
+  color: #34d399;
+}
+
+
 
