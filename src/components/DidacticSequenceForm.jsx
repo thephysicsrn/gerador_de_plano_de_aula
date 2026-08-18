@@ -121,9 +121,10 @@ export default function DidacticSequenceForm({ onGenerate, isLoading, user }) {
                   value={disciplina}
                   onChange={(e) => setDisciplina(e.target.value)}
                 >
-                  {DISCIPLINAS.map(d => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
+                  {DISCIPLINAS.map(d => {
+                    const name = typeof d === 'object' ? (d.name || d.label) : d;
+                    return <option key={name} value={name}>{name}</option>;
+                  })}
                 </select>
               </div>
 
@@ -136,9 +137,10 @@ export default function DidacticSequenceForm({ onGenerate, isLoading, user }) {
                   value={anoSerie}
                   onChange={(e) => setAnoSerie(e.target.value)}
                 >
-                  {ANOS_SERIES.map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
+                  {ANOS_SERIES.map(s => {
+                    const label = typeof s === 'object' ? (s.label || s.name) : s;
+                    return <option key={label} value={label}>{label}</option>;
+                  })}
                 </select>
               </div>
             </div>
@@ -271,9 +273,10 @@ export default function DidacticSequenceForm({ onGenerate, isLoading, user }) {
                 value={tipoMetodologia}
                 onChange={(e) => setTipoMetodologia(e.target.value)}
               >
-                {TIPOS_METODOLOGIA.map(m => (
-                  <option key={m} value={m}>{m}</option>
-                ))}
+                {TIPOS_METODOLOGIA.map(m => {
+                  const label = typeof m === 'object' ? (m.label || m.name) : m;
+                  return <option key={label} value={label}>{label}</option>;
+                })}
               </select>
             </div>
 

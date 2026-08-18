@@ -209,9 +209,10 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
               value={necessidade}
               onChange={(e) => setNecessidade(e.target.value)}
             >
-              {NECESSIDADES_PEI.map(n => (
-                <option key={n} value={n}>{n}</option>
-              ))}
+              {NECESSIDADES_PEI.map(n => {
+                const label = typeof n === 'object' ? (n.label || n.name) : n;
+                return <option key={label} value={label}>{label}</option>;
+              })}
               <option value="Adaptação Geral AEE (Simplificação de Vocabulário & Pistas Visuais)">Adaptação Geral AEE (Simplificação de Vocabulário & Pistas Visuais)</option>
             </select>
           </div>
@@ -225,9 +226,10 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
               value={anoSerie}
               onChange={(e) => setAnoSerie(e.target.value)}
             >
-              {ANOS_SERIES.map(s => (
-                <option key={s} value={s}>{s}</option>
-              ))}
+              {ANOS_SERIES.map(s => {
+                const label = typeof s === 'object' ? (s.label || s.name) : s;
+                return <option key={label} value={label}>{label}</option>;
+              })}
             </select>
           </div>
         </div>
@@ -242,9 +244,10 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
               value={disciplina}
               onChange={(e) => setDisciplina(e.target.value)}
             >
-              {DISCIPLINAS.map(d => (
-                <option key={d} value={d}>{d}</option>
-              ))}
+              {DISCIPLINAS.map(d => {
+                const name = typeof d === 'object' ? (d.name || d.label) : d;
+                return <option key={name} value={name}>{name}</option>;
+              })}
             </select>
           </div>
 

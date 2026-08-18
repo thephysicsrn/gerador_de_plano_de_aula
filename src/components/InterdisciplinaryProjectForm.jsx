@@ -91,9 +91,10 @@ export default function InterdisciplinaryProjectForm({ onGenerate, isLoading }) 
                   value={disciplinaPrincipal}
                   onChange={(e) => setDisciplinaPrincipal(e.target.value)}
                 >
-                  {DISCIPLINAS.map(d => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
+                  {DISCIPLINAS.map(d => {
+                    const name = typeof d === 'object' ? (d.name || d.label) : d;
+                    return <option key={name} value={name}>{name}</option>;
+                  })}
                 </select>
               </div>
 
@@ -106,9 +107,10 @@ export default function InterdisciplinaryProjectForm({ onGenerate, isLoading }) 
                   value={anoSerie}
                   onChange={(e) => setAnoSerie(e.target.value)}
                 >
-                  {ANOS_SERIES.map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
+                  {ANOS_SERIES.map(s => {
+                    const label = typeof s === 'object' ? (s.label || s.name) : s;
+                    return <option key={label} value={label}>{label}</option>;
+                  })}
                 </select>
               </div>
             </div>
@@ -120,20 +122,22 @@ export default function InterdisciplinaryProjectForm({ onGenerate, isLoading }) 
                 <span>Selecione até 3 Disciplinas Integradas (Parceiras)</span>
               </label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {DISCIPLINAS.filter(d => d !== disciplinaPrincipal).map(d => {
-                  const isSelected = disciplinasSecundarias.includes(d);
-                  return (
-                    <button
-                      key={d}
-                      type="button"
-                      className={`btn-tag-select ${isSelected ? 'selected' : ''}`}
-                      onClick={() => toggleSecundaria(d)}
-                    >
-                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 mr-1 inline" />}
-                      <span>{d}</span>
-                    </button>
-                  );
-                })}
+                {DISCIPLINAS.map(dObj => typeof dObj === 'object' ? (dObj.name || dObj.label) : dObj)
+                  .filter(name => name !== disciplinaPrincipal)
+                  .map(name => {
+                    const isSelected = disciplinasSecundarias.includes(name);
+                    return (
+                      <button
+                        key={name}
+                        type="button"
+                        className={`btn-tag-select ${isSelected ? 'selected' : ''}`}
+                        onClick={() => toggleSecundaria(name)}
+                      >
+                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 mr-1 inline" />}
+                        <span>{name}</span>
+                      </button>
+                    );
+                  })}
               </div>
             </div>
 

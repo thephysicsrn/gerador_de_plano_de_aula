@@ -99,9 +99,10 @@ export default function PedagogicalReportForm({ onGenerate, isLoading }) {
                   value={anoSerie}
                   onChange={(e) => setAnoSerie(e.target.value)}
                 >
-                  {ANOS_SERIES.map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
+                  {ANOS_SERIES.map(s => {
+                    const label = typeof s === 'object' ? (s.label || s.name) : s;
+                    return <option key={label} value={label}>{label}</option>;
+                  })}
                 </select>
               </div>
 
@@ -115,9 +116,10 @@ export default function PedagogicalReportForm({ onGenerate, isLoading }) {
                   value={disciplina}
                   onChange={(e) => setDisciplina(e.target.value)}
                 >
-                  {DISCIPLINAS.map(d => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
+                  {DISCIPLINAS.map(d => {
+                    const name = typeof d === 'object' ? (d.name || d.label) : d;
+                    return <option key={name} value={name}>{name}</option>;
+                  })}
                 </select>
               </div>
             </div>
