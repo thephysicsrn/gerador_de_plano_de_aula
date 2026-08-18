@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FileText, 
   HeartHandshake, 
@@ -33,6 +33,35 @@ export default function PublicLandingPage({ onLoginSuccess, darkMode, setDarkMod
   
   // Estado para o FAQ Accordion
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
+
+  // Rolagem suave automática ao carregar com um hash na URL (ex: #rede-sesi)
+  useEffect(() => {
+    const handleHashScroll = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const id = hash.replace('#', '');
+        const element = document.getElementById(id);
+        if (element) {
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 150);
+        }
+      }
+    };
+
+    handleHashScroll();
+    window.addEventListener('hashchange', handleHashScroll);
+    return () => window.removeEventListener('hashchange', handleHashScroll);
+  }, []);
+
+  const handleNavClick = (e, targetId) => {
+    e.preventDefault();
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.history.pushState(null, '', `#${targetId}`);
+    }
+  };
 
   const openAuth = (mode = 'login') => {
     setAuthMode(mode);
@@ -84,11 +113,11 @@ export default function PublicLandingPage({ onLoginSuccess, darkMode, setDarkMod
           </div>
 
           <nav className="header-nav-podia">
-            <a href="#funcionalidades" className="nav-link-podia">Funcionalidades</a>
-            <a href="#rede-sesi" className="nav-link-podia">Matrizes & BNCC</a>
-            <a href="#demonstracao" className="nav-link-podia">Exemplo Vivo</a>
-            <a href="#como-funciona" className="nav-link-podia">Como Funciona</a>
-            <a href="#faq" className="nav-link-podia">Dúvidas (FAQ)</a>
+            <a href="#funcionalidades" className="nav-link-podia" onClick={(e) => handleNavClick(e, 'funcionalidades')}>Funcionalidades</a>
+            <a href="#rede-sesi" className="nav-link-podia" onClick={(e) => handleNavClick(e, 'rede-sesi')}>Matrizes & BNCC</a>
+            <a href="#demonstracao" className="nav-link-podia" onClick={(e) => handleNavClick(e, 'demonstracao')}>Exemplo Vivo</a>
+            <a href="#como-funciona" className="nav-link-podia" onClick={(e) => handleNavClick(e, 'como-funciona')}>Como Funciona</a>
+            <a href="#faq" className="nav-link-podia" onClick={(e) => handleNavClick(e, 'faq')}>Dúvidas (FAQ)</a>
           </nav>
 
           <div className="header-actions">
