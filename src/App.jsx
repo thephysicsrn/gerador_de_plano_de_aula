@@ -304,7 +304,10 @@ export default function App() {
         ) : (
           <>
             {activeTab === 'hero' && (
-              <HeroSection onSelectTab={(tab) => setActiveTab(tab)} />
+              <HeroSection onSelectTab={(tab) => {
+                setGeneratedPlan(null);
+                setActiveTab(tab);
+              }} />
             )}
 
             {activeTab === 'lesson-plan' && (

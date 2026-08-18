@@ -168,8 +168,15 @@ export default function HeroSection({ onSelectTab }) {
           return (
             <div
               key={tool.id}
-              className="studio-tool-card"
+              className="studio-tool-card group"
               onClick={() => onSelectTab(tool.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  onSelectTab(tool.id);
+                }
+              }}
             >
               {/* Topo do Card: Ícone Colorido + Tag */}
               <div className="tool-card-header">
@@ -187,10 +194,17 @@ export default function HeroSection({ onSelectTab }) {
 
               {/* Rodapé do Card: Ação Limpa com Seta */}
               <div className="tool-card-footer">
-                <span className="tool-action-link">
-                  Criar Agora
+                <button
+                  type="button"
+                  className="tool-action-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectTab(tool.id);
+                  }}
+                >
+                  <span>Criar Agora</span>
                   <ArrowRight className="w-3.5 h-3.5 ml-1.5 transition-transform group-hover:translate-x-1" />
-                </span>
+                </button>
               </div>
             </div>
           );
