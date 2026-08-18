@@ -66,7 +66,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
       onAuthSuccess(user);
       onClose();
     } catch (err) {
-      setErrorMsg(err.message || 'Erro ao entrar com Microsoft.');
+      setErrorMsg('O login com a Microsoft requer aprovação no Azure Entra ID. Utilize o "Entrar com Google" ou crie sua conta com E-mail e Senha!');
     } finally {
       setIsLoading(false);
     }
