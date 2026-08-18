@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, X, AlertCircle, Building2, CheckCircle2 } from 'lucide-react';
-import { signInUser, signUpUser, signInWithGoogle, signInWithMicrosoft } from '../services/firebaseService';
+import { signInUser, signUpUser, signInWithGoogle } from '../services/firebaseService';
 
 export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode = 'login' }) {
   const [mode, setMode] = useState(initialMode); // 'login' ou 'signup'
@@ -53,20 +53,6 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
       onClose();
     } catch (err) {
       setErrorMsg(err.message || 'Erro ao entrar com Google.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleMicrosoftAuth = async () => {
-    setErrorMsg('');
-    setIsLoading(true);
-    try {
-      const user = await signInWithMicrosoft(redeEnsino);
-      onAuthSuccess(user);
-      onClose();
-    } catch (err) {
-      setErrorMsg('O login com a Microsoft requer aprovação no Azure Entra ID. Utilize o "Entrar com Google" ou crie sua conta com E-mail e Senha!');
     } finally {
       setIsLoading(false);
     }
@@ -212,37 +198,20 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
             <span className="relative bg-white dark:bg-slate-900 px-3 text-xs text-slate-400 font-medium uppercase">ou acesse com</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              className="btn btn-secondary flex items-center justify-center gap-2 py-2.5 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
-              onClick={handleGoogleAuth}
-              disabled={isLoading}
-            >
-              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.3 8.9 5 12 5z"/>
-                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
-                <path fill="#FBBC05" d="M5.3 14.8c-.3-.8-.4-1.8-.4-2.8s.1-2 .4-2.8L1.6 6.3C.6 8.3 0 10.6 0 13s.6 4.7 1.6 6.7l3.7-2.9z"/>
-                <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.3-6.7-5.3L1.6 16C3.5 19.8 7.4 23 12 23z"/>
-              </svg>
-              <span>Google</span>
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-secondary flex items-center justify-center gap-2 py-2.5 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
-              onClick={handleMicrosoftAuth}
-              disabled={isLoading}
-            >
-              <svg className="w-4 h-4 shrink-0" viewBox="0 0 23 23">
-                <path fill="#f35325" d="M1 1h10v10H1z"/>
-                <path fill="#81bc06" d="M12 1h10v10H12z"/>
-                <path fill="#05a6f0" d="M1 12h10v10H1z"/>
-                <path fill="#ffba08" d="M12 12h10v10H12z"/>
-              </svg>
-              <span>Microsoft</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            className="w-full btn btn-secondary flex items-center justify-center gap-2.5 py-3 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer shadow-sm"
+            onClick={handleGoogleAuth}
+            disabled={isLoading}
+          >
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+              <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.3 8.9 5 12 5z"/>
+              <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
+              <path fill="#FBBC05" d="M5.3 14.8c-.3-.8-.4-1.8-.4-2.8s.1-2 .4-2.8L1.6 6.3C.6 8.3 0 10.6 0 13s.6 4.7 1.6 6.7l3.7-2.9z"/>
+              <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.3-6.7-5.3L1.6 16C3.5 19.8 7.4 23 12 23z"/>
+            </svg>
+            <span>Continuar com o Google</span>
+          </button>
         </form>
 
         <div className="auth-footer">

@@ -263,7 +263,20 @@ export async function signInWithGoogle(redeEnsino = 'REDE_SESI') {
     return userData;
   } catch (error) {
     console.error('Erro no login com Google:', error);
-    throw new Error('Não foi possível entrar com o Google: ' + (error.message || 'tente novamente.'));
+
+    if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+      throw new Error('A janela de login com o Google foi fechada.');
+    }
+
+    if (error.code === 'auth/operation-not-allowed') {
+      throw new Error('O login via Google precisa ser ativado no Firebase Console (Authentication > Sign-in method > ativar Google).');
+    }
+
+    if (error.code === 'auth/unauthorized-domain') {
+      throw new Error('Adicione o domínio edu-plan1.vercel.app aos Domínios Autorizados no Firebase Console (Authentication > Settings > Authorized Domains).');
+    }
+
+    throw new Error('Erro ao autenticar com Google. Utilize a aba "Criar Conta Grátis" com e-mail e senha.');
   }
 }
 
