@@ -9,14 +9,14 @@ import {
   updateProfile
 } from 'firebase/auth';
 
-// Configuração Padrão do Firebase (Projeto Oficial Conectado)
+// Configuração Padrão do Firebase (Projeto Oficial Exclusivo: eduplan-app-2026)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyAStUxVvpC8M0wN9zBkb36Tf7uQ244Osfs",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "recepcao-sesi-atrasos.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "recepcao-sesi-atrasos",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "recepcao-sesi-atrasos.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "1058395723243",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:1058395723243:web:6f1ddda2fc8e0bc284f5ae"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyC48dPN5vJwZkDQ12AkldtgXyR4yb_nY-M",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "eduplan-app-2026.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "eduplan-app-2026",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "eduplan-app-2026.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "882729230788",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:882729230788:web:4d75d558094e3b0d2ec491"
 };
 
 // Inicialização segura da App Firebase
