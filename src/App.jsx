@@ -94,7 +94,7 @@ export default function App() {
     setIsLoading(true);
     try {
       let result;
-      if (useAi && getStoredApiKey()) {
+      if (useAi && (getStoredApiKey() || getStoredGeminiKey())) {
         result = await generateLessonPlanWithAI(formData);
       } else {
         result = generateMockLessonPlan(formData);
@@ -117,7 +117,7 @@ export default function App() {
     setIsLoading(true);
     try {
       let result;
-      if (useAi && getStoredApiKey()) {
+      if (useAi && (getStoredApiKey() || getStoredGeminiKey())) {
         result = await generatePeiWithAI(formData);
       } else {
         result = generateMockPei(formData);
@@ -140,7 +140,7 @@ export default function App() {
     setIsLoading(true);
     try {
       let result;
-      if (useAi && getStoredApiKey()) {
+      if (useAi && (getStoredApiKey() || getStoredGeminiKey())) {
         result = await generateDidacticSequenceWithAI(formData);
       } else {
         result = generateMockDidacticSequence(formData);
@@ -163,7 +163,7 @@ export default function App() {
     setIsLoading(true);
     try {
       let result;
-      if (useAi && getStoredApiKey()) {
+      if (useAi && (getStoredApiKey() || getStoredGeminiKey())) {
         result = await generatePedagogicalReportWithAI(formData);
       } else {
         result = generateMockPedagogicalReport(formData);
@@ -186,7 +186,7 @@ export default function App() {
     setIsLoading(true);
     try {
       let result;
-      if (useAi && getStoredApiKey()) {
+      if (useAi && (getStoredApiKey() || getStoredGeminiKey())) {
         result = await generateAdaptedActivityWithAI(formData);
       } else {
         result = generateMockAdaptedActivity(formData);
@@ -209,7 +209,7 @@ export default function App() {
     setIsLoading(true);
     try {
       let result;
-      if (useAi && getStoredApiKey()) {
+      if (useAi && (getStoredApiKey() || getStoredGeminiKey())) {
         result = await generateAnnualCoursePlanWithAI(formData);
       } else {
         result = generateMockAnnualCoursePlan(formData);
@@ -232,7 +232,7 @@ export default function App() {
     setIsLoading(true);
     try {
       let result;
-      if (useAi && getStoredApiKey()) {
+      if (useAi && (getStoredApiKey() || getStoredGeminiKey())) {
         result = await generateInterdisciplinaryProjectWithAI(formData);
       } else {
         result = generateMockInterdisciplinaryProject(formData);
@@ -384,7 +384,7 @@ export default function App() {
       <ApiKeyModal
         isOpen={isApiKeyModalOpen}
         onClose={() => setIsApiKeyModalOpen(false)}
-        onSave={() => setApiKeyConfigured(!!getStoredApiKey())}
+        onSave={() => setApiKeyConfigured(!!(getStoredApiKey() || getStoredGeminiKey()))}
       />
 
       {/* Rodapé Oficial Edu.Plan */}

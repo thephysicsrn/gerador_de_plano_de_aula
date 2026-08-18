@@ -194,8 +194,8 @@ Retorne APENAS um objeto JSON válido (sem cercas markdown de código \`\`\`json
 
   try {
     const rawResult = await callAI([
-      { role: \'system\', content: promptSystem },
-      { role: \'user\', content: promptUser }
+      { role: 'system', content: promptSystem },
+      { role: 'user', content: promptUser }
     ]);
 
     const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
@@ -257,8 +257,8 @@ Retorne APENAS um objeto JSON estruturado com as seguintes chaves:
 
   try {
     const rawResult = await callAI([
-      { role: \'system\', content: promptSystem },
-      { role: \'user\', content: promptUser }
+      { role: 'system', content: promptSystem },
+      { role: 'user', content: promptUser }
     ]);
 
     const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
@@ -546,9 +546,7 @@ PARÂMETROS DA ADAPTAÇÃO:
 
 Analise CUIDADOSAMENTE cada questão da atividade original, identifique seus tipos e barreiras, e gere a adaptação completa e individualizada para cada questão. Retorne APENAS o JSON, sem texto antes ou depois.`;
 
-    const rawResult = await callAI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }],
-      apiKey
-    );
+    const rawResult = await callAI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }]);
 
     // Extração robusta de JSON — funciona mesmo se a IA adicionar texto antes/depois
     let jsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
