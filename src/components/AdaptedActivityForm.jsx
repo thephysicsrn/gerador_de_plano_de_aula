@@ -1,12 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { Accessibility, Sparkles, Upload, FileText, CheckCircle2, Copy, File, RefreshCw } from 'lucide-react';
+import { Accessibility, Sparkles, Upload, FileText, CheckCircle2, Copy, File, RefreshCw, AlertTriangle } from 'lucide-react';
 import { ANOS_SERIES, DISCIPLINAS, NECESSIDADES_PEI } from '../data/bnccData';
 
 export default function AdaptedActivityForm({ onGenerate, isLoading }) {
-  const [inputMode, setInputMode] = useState('text'); // 'text' ou 'upload'
+  const [inputMode, setInputMode] = useState('text');
   const [originalText, setOriginalText] = useState('');
   const [fileName, setFileName] = useState('');
   const [fileLoading, setFileLoading] = useState(false);
+  const [fileError, setFileError] = useState('');
 
   // Parâmetros de Adaptação
   const [necessidade, setNecessidade] = useState('Transtorno do Espectro Autista (TEA / Autismo)');
@@ -17,52 +18,109 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
 
   const fileInputRef = useRef(null);
 
-  // Leitura automática do arquivo enviado
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // --- Extratores de texto por tipo de arquivo ---
 
+  const extractPdfText = async (arrayBuffer) => {
+    const pdfjsLib = await import('pdfjs-dist');
+    // Aponta o worker para o arquivo correto dentro do node_modules
+    pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.min.mjs',
+      import.meta.url
+    ).toString();
+
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pageTexts = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      // Agrupa itens por linha usando transform[5] (y-coordinate)
+      const lines = {};
+      textContent.items.forEach((item) => {
+        const y = Math.round(item.transform[5]);
+        if (!lines[y]) lines[y] = [];
+        lines[y].push(item.str);
+      });
+      const sortedY = Object.keys(lines).map(Number).sort((a, b) => b - a);
+      const pageText = sortedY.map((y) => lines[y].join(' ')).join('\n');
+      pageTexts.push(pageText);
+    }
+    return pageTexts.join('\n\n').trim();
+  };
+
+  const extractDocxText = async (arrayBuffer) => {
+    const mammoth = await import('mammoth');
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    return result.value.trim();
+  };
+
+  const extractTxtText = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = () => reject(new Error('Falha ao ler arquivo de texto.'));
+      reader.readAsText(file, 'UTF-8');
+    });
+  };
+
+  // --- Handler principal de upload ---
+
+  const processFile = async (file) => {
     setFileName(file.name);
     setFileLoading(true);
+    setOriginalText('');
+    setFileError('');
 
-    const reader = new FileReader();
+    try {
+      const ext = file.name.split('.').pop().toLowerCase();
+      let extractedText = '';
 
-    reader.onload = (event) => {
-      let content = event.target.result;
-
-      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-        content = content
-          .replace(/[^\x20-\x7E\xA0-\xFF\n\r\t]/g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
+      if (ext === 'pdf') {
+        const buffer = await file.arrayBuffer();
+        extractedText = await extractPdfText(buffer);
+      } else if (ext === 'docx' || ext === 'doc') {
+        const buffer = await file.arrayBuffer();
+        extractedText = await extractDocxText(buffer);
+      } else if (['txt', 'md', 'csv'].includes(ext)) {
+        extractedText = await extractTxtText(file);
+      } else {
+        // Tenta ler como texto puro como fallback
+        extractedText = await extractTxtText(file);
       }
 
-      setOriginalText(content);
+      if (!extractedText || extractedText.length < 10) {
+        setFileError('Não foi possível extrair texto legível deste arquivo. Tente copiar e colar o conteúdo diretamente.');
+        setOriginalText('');
+      } else {
+        setOriginalText(extractedText);
+      }
+    } catch (err) {
+      console.error('Erro ao processar arquivo:', err);
+      setFileError('Erro ao processar o arquivo: ' + (err.message || 'formato não suportado. Use PDF, DOCX ou TXT.'));
+      setOriginalText('');
+    } finally {
       setFileLoading(false);
-    };
+    }
+  };
 
-    reader.onerror = () => {
-      alert('Erro ao ler o arquivo. Tente copiar e colar o texto diretamente.');
-      setFileLoading(false);
-    };
-
-    reader.readAsText(file);
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) processFile(file);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.target.files ? e.target.files[0] : e.dataTransfer.files[0];
-      setFileName(file.name);
-      setFileLoading(true);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setOriginalText(event.target.result);
-        setFileLoading(false);
-      };
-      reader.readAsText(file);
-    }
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
   };
+
+  const handleReset = () => {
+    setFileName('');
+    setOriginalText('');
+    setFileError('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // --- Submit ---
 
   const handleSubmit = (useAi = true) => {
     if (!originalText.trim()) {
@@ -88,18 +146,18 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
   return (
     <div className="workspace-split-container animate-fade-in">
       <div className="form-card main-form-card">
-        {/* Banner de Título Padrão */}
+        {/* Banner de Título */}
         <div className="form-card-header">
           <div className="icon-wrapper bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
             <Accessibility className="w-6 h-6" />
           </div>
           <div>
-            <h2>Adaptação Rápida de Atividades & Acessibilidade</h2>
+            <h2>Adaptação Rápida de Atividades &amp; Acessibilidade</h2>
             <p>Transforme qualquer exercício ou texto de prova em uma versão acessível para TEA, TDAH, Dislexia ou Baixa Visão</p>
           </div>
         </div>
 
-        {/* Escolha do Modo de Entrada: Copiar & Colar vs Upload */}
+        {/* Modo de entrada */}
         <div className="flex gap-3 mb-6">
           <button
             type="button"
@@ -107,7 +165,7 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
             onClick={() => setInputMode('text')}
           >
             <Copy className="w-4 h-4 mr-2 inline" />
-            Copiar & Colar Texto
+            Copiar &amp; Colar Texto
           </button>
 
           <button
@@ -120,7 +178,7 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
           </button>
         </div>
 
-        {/* MODO 1: COPIAR E COLAR TEXTO */}
+        {/* MODO 1: COPIAR E COLAR */}
         {inputMode === 'text' && (
           <div className="form-group col-span-12 animate-fade-in mb-4">
             <label className="form-label">
@@ -128,8 +186,8 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
               <span>Cole aqui a Atividade ou Enunciado Original</span>
             </label>
             <textarea
-              className="form-textarea font-mono text-sm"
-              rows={5}
+              className="form-textarea text-sm"
+              rows={6}
               placeholder="Ex: Questão 1: Leia o texto abaixo e analise as causas da Revolução Industrial na Europa do século XVIII..."
               value={originalText}
               onChange={(e) => setOriginalText(e.target.value)}
@@ -145,6 +203,7 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
               <span>Selecione o Arquivo da Atividade (PDF, TXT, DOCX)</span>
             </label>
 
+            {/* Drop zone */}
             <div
               className="p-6 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl text-center cursor-pointer hover:border-emerald-500 transition-colors bg-slate-50/50 dark:bg-slate-900/50"
               onClick={() => fileInputRef.current?.click()}
@@ -155,46 +214,75 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileUpload}
-                accept=".txt,.pdf,.doc,.docx,.json,.md"
+                accept=".txt,.pdf,.doc,.docx,.md"
                 style={{ display: 'none' }}
               />
 
               {fileLoading ? (
                 <div className="flex flex-col items-center justify-center py-4">
                   <RefreshCw className="w-8 h-8 text-indigo-500 animate-spin mb-2" />
-                  <span className="text-sm font-medium">Extraindo texto do arquivo...</span>
+                  <span className="text-sm font-medium text-slate-600">Extraindo texto do arquivo...</span>
+                  <span className="text-xs text-slate-400 mt-1">Isso pode levar alguns segundos para PDFs grandes</span>
                 </div>
-              ) : fileName ? (
+              ) : fileError ? (
+                <div className="flex flex-col items-center justify-center py-3">
+                  <AlertTriangle className="w-8 h-8 text-amber-500 mb-2" />
+                  <span className="font-bold text-amber-700 dark:text-amber-400 text-sm mb-1">Não foi possível ler o arquivo</span>
+                  <span className="text-xs text-slate-500 max-w-xs">{fileError}</span>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleReset(); }}
+                    className="mt-3 text-xs text-indigo-600 underline hover:text-indigo-800"
+                  >
+                    Tentar outro arquivo
+                  </button>
+                </div>
+              ) : fileName && originalText ? (
                 <div className="flex flex-col items-center justify-center py-2">
                   <CheckCircle2 className="w-8 h-8 text-emerald-500 mb-1" />
                   <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">{fileName}</span>
-                  <span className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">Texto extraído com sucesso! Clique para alterar.</span>
+                  <span className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                    ✅ {originalText.length.toLocaleString('pt-BR')} caracteres extraídos · Clique para alterar
+                  </span>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-4">
                   <File className="w-10 h-10 text-slate-400 mb-2" />
                   <span className="font-bold text-slate-700 dark:text-slate-300 text-sm">Clique para selecionar ou arraste o arquivo aqui</span>
-                  <span className="text-xs text-slate-500 mt-1">Suporta PDF, TXT, Word (.docx) e arquivos de texto</span>
+                  <span className="text-xs text-slate-500 mt-1">PDF, TXT e Word (.docx) — extração automática de texto</span>
                 </div>
               )}
             </div>
 
-            {/* Preview do texto lido */}
-            {originalText && (
+            {/* Pré-visualização do texto extraído */}
+            {originalText && !fileLoading && (
               <div className="mt-3">
-                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1 block">Pré-visualização do texto extraído:</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                    Pré-visualização do texto extraído ({originalText.split('\n').filter(l => l.trim()).length} linhas):
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="text-xs text-rose-500 hover:text-rose-700 underline"
+                  >
+                    Limpar arquivo
+                  </button>
+                </div>
                 <textarea
-                  className="form-textarea font-mono text-xs text-slate-700 dark:text-slate-300"
-                  rows={3}
+                  className="form-textarea text-xs text-slate-700 dark:text-slate-300"
+                  style={{ fontFamily: 'inherit', lineHeight: '1.6' }}
+                  rows={5}
                   value={originalText}
                   onChange={(e) => setOriginalText(e.target.value)}
                 />
+                <p className="text-xs text-slate-400 mt-1">💡 Você pode editar o texto acima antes de gerar a adaptação.</p>
               </div>
             )}
           </div>
         )}
 
-        {/* OPÇÕES DE ADAPTAÇÃO INCLUSIVA */}
+        {/* OPÇÕES DE ADAPTAÇÃO */}
         <div className="form-grid">
           <div className="form-group col-span-6">
             <label className="form-label">
@@ -210,7 +298,9 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
                 const label = typeof n === 'object' ? (n.label || n.name) : n;
                 return <option key={label} value={label}>{label}</option>;
               })}
-              <option value="Adaptação Geral AEE (Simplificação de Vocabulário & Pistas Visuais)">Adaptação Geral AEE (Simplificação de Vocabulário & Pistas Visuais)</option>
+              <option value="Adaptação Geral AEE (Simplificação de Vocabulário &amp; Pistas Visuais)">
+                Adaptação Geral AEE (Simplificação de Vocabulário &amp; Pistas Visuais)
+              </option>
             </select>
           </div>
 
@@ -267,10 +357,9 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
           </div>
         </div>
 
-        {/* CTA DE GERAÇÃO */}
+        {/* CTA */}
         <div className="step-nav-footer mt-6">
           <div></div>
-
           <button
             type="button"
             className="btn btn-primary btn-sparkle"

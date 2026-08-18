@@ -382,6 +382,14 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
           {/* CONTEÚDO DA ATIVIDADE ADAPTADA */}
           {isAdaptedActivity && (
             <>
+              {/* Análise da IA da atividade original */}
+              {content.analiseOriginal && (
+                <div className="doc-section" style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', border: '1px solid #bae6fd', borderRadius: '12px', padding: '16px' }}>
+                  <h3 className="doc-section-title" style={{ color: '#0369a1' }}>🔍 Análise da IA — Diagnóstico da Atividade Original</h3>
+                  <p className="doc-paragraph" style={{ color: '#0c4a6e', fontSize: '0.9rem' }}>{content.analiseOriginal}</p>
+                </div>
+              )}
+
               {content.enunciadoAdaptado && (
                 <div className="doc-section">
                   <h3 className="doc-section-title">1. Instruções e Orientação Acessível</h3>
@@ -395,9 +403,19 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                   <div className="doc-steps">
                     {content.questoesEExercicios.map((q, idx) => (
                       <div key={idx} className="step-card mb-4 p-4 border border-slate-200 rounded-lg">
-                        <div className="step-header mb-2">
+                        <div className="step-header mb-2 flex flex-wrap items-center gap-2">
                           <span className="step-title font-bold text-slate-900">{q.numero}</span>
+                          {q.tipoOriginal && (
+                            <span style={{ fontSize: '0.7rem', background: '#e0e7ff', color: '#4338ca', borderRadius: '999px', padding: '2px 10px', fontWeight: 600 }}>
+                              {q.tipoOriginal}
+                            </span>
+                          )}
                         </div>
+                        {q.estrategiaAdotada && (
+                          <p style={{ fontSize: '0.75rem', color: '#6d28d9', background: '#f5f3ff', borderRadius: '6px', padding: '6px 10px', marginBottom: '8px', borderLeft: '3px solid #7c3aed' }}>
+                            🧠 <strong>Estratégia:</strong> {q.estrategiaAdotada}
+                          </p>
+                        )}
                         <p className="step-desc text-sm text-slate-800 font-semibold mb-2">{q.enunciadoSimples}</p>
                         {q.opcoesOuEspaco && (
                           <pre className="bg-slate-50 p-3 rounded text-xs font-mono whitespace-pre-wrap text-slate-700 mb-2">
@@ -428,6 +446,15 @@ export default function PlanViewer({ plan, onBack, onSaveSuccess, user }) {
                 <div className="doc-section doc-section-highlight">
                   <h3 className="doc-section-title">4. Orientação Pedagógica de Aplicação (AEE)</h3>
                   <p className="doc-paragraph">{content.orientacaoAoProfessor}</p>
+                </div>
+              )}
+
+              {content.recursosComplementaresSugeridos && Array.isArray(content.recursosComplementaresSugeridos) && content.recursosComplementaresSugeridos.length > 0 && (
+                <div className="doc-section">
+                  <h3 className="doc-section-title">5. Recursos Complementares Sugeridos pela IA</h3>
+                  <ul className="doc-list">
+                    {content.recursosComplementaresSugeridos.map((item, i) => <li key={i}>{item}</li>)}
+                  </ul>
                 </div>
               )}
             </>

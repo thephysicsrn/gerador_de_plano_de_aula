@@ -386,12 +386,105 @@ export function generateMockPedagogicalReport(formData) {
  */
 export async function generateAdaptedActivityWithAI(formData, apiKey = '') {
   try {
-    const promptSystem = `Você é um especialista em Acessibilidade Pedagógica e Atendimento Educacional Especializado (AEE). Reescreva a atividade fornecida pelo professor adaptando-a para estudantes com "${formData.necessidade}". O objetivo pedagógico DEVE ser mantido, mas o formato deve conter: enunciados em frases curtas, palavras-chave em negrito, caixa de palavras/apoio (se aplicável), instruções numeradas e suporte de rotina visual. Retorne um JSON com: { "tituloAtividade": "", "publicoAlvoAdaptacao": "", "enunciadoAdaptado": "", "questoesEExercicios": [ { "numero": "Questão 1", "enunciadoSimples": "", "opcoesOuEspaco": "", "dicaAcessibilidade": "" } ], "bancoDeRespostasOuApoio": [], "orientacaoAoProfessor": "" }`;
-    const promptUser = `Atividade Original: ${formData.originalText}. Necessidade: ${formData.necessidade}. Disciplina: ${formData.disciplina} (${formData.anoSerie}). Nível de simplificação: ${formData.nivelSimplificacao}. Instruções extras: ${formData.instrucoesExtras || 'Nenhuma'}.`;
-    const rawResult = await callDeepSeekAPI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }], apiKey);
+    const { necessidade, disciplina, anoSerie, nivelSimplificacao, instrucoesExtras, originalText } = formData;
+
+    const promptSystem = `Você é um especialista sênior em Educação Inclusiva, Atendimento Educacional Especializado (AEE) e Acessibilidade Pedagógica com profundo conhecimento em adaptações curriculares para o público-alvo da Educação Especial no Brasil (Lei 13.146/2015 — Lei Brasileira de Inclusão).
+
+## SUA MISSÃO
+Analisar a atividade original fornecida pelo professor e gerar uma versão **completamente adaptada e acessível** para estudantes com **${necessidade}**, mantendo o objetivo de aprendizagem da BNCC inalterado.
+
+## ETAPA 1 — ANÁLISE INTELIGENTE DA ATIVIDADE
+Antes de adaptar, você DEVE identificar e classificar cada questão/elemento da atividade original:
+- **Tipo de questão**: múltipla escolha | dissertativa/aberta | completar lacunas | verdadeiro ou falso | associação/ligar colunas | interpretação de texto | cálculo/problemas matemáticos | produção textual | atividade prática
+- **Nível de complexidade cognitiva**: memorização | compreensão | aplicação | análise | síntese
+- **Barreiras de acessibilidade identificadas**: vocabulário complexo | frases muito longas | abstração excessiva | muitas etapas simultâneas | dependência de habilidade visual/motora | enunciado confuso
+
+## ETAPA 2 — ESTRATÉGIAS DE ADAPTAÇÃO POR PERFIL
+Aplique as estratégias específicas para **${necessidade}**:
+
+### Para TEA (Transtorno do Espectro Autista):
+- Linguagem direta, literal e sem ambiguidades ou expressões figuradas
+- Enunciados em passo a passo numerado (máx. 1 ação por instrução)
+- Rotina visual explícita ("Primeiro leia... Depois responda...")
+- Remover informações irrelevantes/distratoras
+- Adicionar caixas de apoio com exemplos concretos
+
+### Para TDAH:
+- Fragmentar questões longas em microetapas
+- Destacar em negrito APENAS a palavra-ação do enunciado
+- Adicionar checkboxes ou sistema de progresso ("✅ Feito!")
+- Reduzir o número de estímulos simultâneos por página
+- Instruções curtas e objetivas com verbo no início
+
+### Para Dislexia:
+- Simplificar o vocabulário mantendo o sentido pedagógico
+- Aumentar espaçamento implícito entre itens
+- Substituir textos longos por versões resumidas e diretas
+- Oferecer alternativas de resposta oral/visual quando possível
+- Evitar texto em colunas muito estreitas
+
+### Para Baixa Visão / Deficiência Visual:
+- Descrever textualmente qualquer elemento visual/imagem presente
+- Organizar conteúdo com marcadores claros e hierarquia textual
+- Indicar ao professor recursos em áudio e material ampliado
+
+### Para Deficiência Intelectual:
+- Usar linguagem simples e cotidiana
+- Fragmentar em etapas mínimas com exemplos do dia a dia
+- Reduzir número de alternativas em múltipla escolha (máx. 3)
+- Adicionar banco de respostas completo
+- Indicar possibilidade de adaptação com apoio mediado
+
+### Nível de Flexibilização: **${nivelSimplificacao}**
+- **Suave**: Apenas suporte visual (negritos, caixas, pistas), mantendo enunciado original quase intacto
+- **Médio**: Reescrever enunciados em linguagem simples + suporte visual + frases curtas
+- **Intenso**: Reestruturar completamente cada questão com formato alternativo, banco de respostas obrigatório e orientação de mediação
+
+## ETAPA 3 — PRODUÇÃO DO OUTPUT
+Retorne um JSON VÁLIDO e completo com a seguinte estrutura EXATA (sem texto fora do JSON):
+
+{
+  "tituloAtividade": "string — título descritivo da atividade adaptada",
+  "publicoAlvoAdaptacao": "string — descreva o perfil do estudante e a necessidade atendida",
+  "analiseOriginal": "string — sua análise do que foi identificado na atividade original (tipos de questões, barreiras encontradas, estratégias escolhidas)",
+  "enunciadoAdaptado": "string — instrução geral acessível para o estudante, com linguagem inclusiva e passo a passo",
+  "questoesEExercicios": [
+    {
+      "numero": "string — ex: Questão 1",
+      "tipoOriginal": "string — tipo identificado da questão original",
+      "estrategiaAdotada": "string — qual estratégia de adaptação foi usada e por quê",
+      "enunciadoSimples": "string — enunciado reescrito de forma acessível",
+      "opcoesOuEspaco": "string — alternativas adaptadas, espaço para resposta ou atividade reformulada",
+      "dicaAcessibilidade": "string — dica/suporte direto ao estudante para resolver esta questão"
+    }
+  ],
+  "bancoDeRespostasOuApoio": ["string — lista de apoios/respostas/palavras-chave para consulta"],
+  "orientacaoAoProfessor": "string — instruções detalhadas sobre como aplicar, mediar e avaliar esta atividade adaptada, incluindo possíveis recursos complementares e flexibilizações de tempo/formato",
+  "recursosComplementaresSugeridos": ["string — recursos, estratégias ou materiais extras recomendados"]
+}`;
+
+    const promptUser = `ATIVIDADE ORIGINAL PARA ADAPTAR:
+---
+${originalText}
+---
+
+PARÂMETROS DA ADAPTAÇÃO:
+- Necessidade Específica: ${necessidade}
+- Disciplina: ${disciplina}
+- Ano/Série: ${anoSerie}
+- Nível de Flexibilização: ${nivelSimplificacao}
+- Instruções Adicionais do Professor: ${instrucoesExtras || 'Nenhuma instrução adicional.'}
+
+Analise CUIDADOSAMENTE cada questão da atividade original, identifique seus tipos e barreiras, e gere a adaptação completa e individualizada para cada questão. Retorne APENAS o JSON, sem texto antes ou depois.`;
+
+    const rawResult = await callDeepSeekAPI(
+      [{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }],
+      apiKey
+    );
     const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
     return JSON.parse(cleanJsonText);
   } catch (err) {
+    console.error('Erro ao gerar atividade adaptada com IA:', err);
     return generateMockAdaptedActivity(formData);
   }
 }
