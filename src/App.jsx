@@ -32,7 +32,7 @@ import {
   generateMockAnnualCoursePlan,
   generateMockInterdisciplinaryProject
 } from './services/deepseekService';
-import { getStoredApiKey } from './utils/storage';
+import { getStoredApiKey, getStoredGeminiKey } from './utils/storage';
 import { getStoredSessionUser, logoutUser, auth, updateUserRedeEnsino } from './services/firebaseService';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -41,7 +41,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('hero');
   const [darkMode, setDarkMode] = useState(false);
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
-  const [apiKeyConfigured, setApiKeyConfigured] = useState(!!getStoredApiKey());
+  const [apiKeyConfigured, setApiKeyConfigured] = useState(!!(getStoredApiKey() || getStoredGeminiKey()));
 
   const [generatedPlan, setGeneratedPlan] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,7 +64,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    setApiKeyConfigured(!!getStoredApiKey());
+    setApiKeyConfigured(!!(getStoredApiKey() || getStoredGeminiKey()));
   }, [isApiKeyModalOpen]);
 
   // Alternar tema no body

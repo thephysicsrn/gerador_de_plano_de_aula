@@ -2,13 +2,14 @@
 
 const STORAGE_KEYS = {
   API_KEY: 'gerador_planos_deepseek_api_key',
+  GEMINI_KEY: 'gerador_planos_gemini_api_key',
   SAVED_PLANS: 'gerador_planos_saved_items',
   CUSTOM_CURRICULUM: 'gerador_planos_custom_curriculum'
 };
 
 // --- API KEY DEEPSEEK ---
 export const getStoredApiKey = () => {
-  return localStorage.getItem(STORAGE_KEYS.API_KEY) || (import.meta.env.VITE_DEEPSEEK_API_KEY || 'eduplan_system_free_key');
+  return localStorage.getItem(STORAGE_KEYS.API_KEY) || (import.meta.env.VITE_DEEPSEEK_API_KEY || '');
 };
 
 export const setStoredApiKey = (key) => {
@@ -16,6 +17,19 @@ export const setStoredApiKey = (key) => {
     localStorage.setItem(STORAGE_KEYS.API_KEY, key.trim());
   } else {
     localStorage.removeItem(STORAGE_KEYS.API_KEY);
+  }
+};
+
+// --- API KEY GOOGLE GEMINI (GRATUITA) ---
+export const getStoredGeminiKey = () => {
+  return localStorage.getItem(STORAGE_KEYS.GEMINI_KEY) || (import.meta.env.VITE_GEMINI_API_KEY || '');
+};
+
+export const setStoredGeminiKey = (key) => {
+  if (key) {
+    localStorage.setItem(STORAGE_KEYS.GEMINI_KEY, key.trim());
+  } else {
+    localStorage.removeItem(STORAGE_KEYS.GEMINI_KEY);
   }
 };
 

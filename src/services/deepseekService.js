@@ -1,11 +1,63 @@
-// Serviço de Inteligência Artificial usando a API do DeepSeek com Prompts Pedagógicos Detalhados
+// Serviço de Inteligência Artificial — Suporte a Google Gemini (gratuito) e DeepSeek
 
-import { getStoredApiKey } from '../utils/storage';
+import { getStoredApiKey, getStoredGeminiKey } from '../utils/storage';
 
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 /**
- * Chamada à API da DeepSeek com prompt estruturado
+ * Chamada à API do Google Gemini (GRATUITA)
+ */
+export async function callGeminiAPI(messages) {
+  let apiKey = getStoredGeminiKey() || import.meta.env.VITE_GEMINI_API_KEY || '';
+
+  if (!apiKey) {
+    throw new Error('SEM_CHAVE_GEMINI');
+  }
+
+  // Converte o formato OpenAI messages para o formato Gemini
+  const systemMsg = messages.find(m => m.role === 'system');
+  const userMsg = messages.find(m => m.role === 'user');
+
+  const contents = [];
+  if (systemMsg) {
+    // Gemini trata system como primeira mensagem de usuário com instrução de sistema
+    contents.push({ role: 'user', parts: [{ text: systemMsg.content }] });
+    contents.push({ role: 'model', parts: [{ text: 'Entendido. Vou seguir essas instruções.' }] });
+  }
+  if (userMsg) {
+    contents.push({ role: 'user', parts: [{ text: userMsg.content }] });
+  }
+
+  const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents,
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 8192,
+        responseMimeType: 'application/json'
+      }
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    if (response.status === 400 || response.status === 403) {
+      throw new Error('Chave do Google Gemini inválida ou sem permissão.');
+    } else if (response.status === 429) {
+      throw new Error('Limite de requisições do Gemini excedido. Tente novamente em alguns instantes.');
+    }
+    throw new Error(errorData.error?.message || `Erro no servidor Gemini (HTTP ${response.status})`);
+  }
+
+  const data = await response.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+/**
+ * Chamada à API da DeepSeek
  */
 export async function callDeepSeekAPI(messages, userApiKey = '') {
   let apiKey = userApiKey.trim() || getStoredApiKey();
@@ -15,7 +67,7 @@ export async function callDeepSeekAPI(messages, userApiKey = '') {
   }
 
   if (!apiKey) {
-    throw new Error('Nenhuma Chave de API customizada do DeepSeek fornecida. Utilizando o gerador pedagógico nativo gratuito.');
+    throw new Error('SEM_CHAVE_DEEPSEEK');
   }
 
   const response = await fetch(DEEPSEEK_API_URL, {
@@ -46,6 +98,23 @@ export async function callDeepSeekAPI(messages, userApiKey = '') {
 
   const data = await response.json();
   return data.choices[0]?.message?.content || '';
+}
+
+/**
+ * Dispatcher unificado: tenta Gemini (gratuito) primeiro, depois DeepSeek
+ */
+export async function callAI(messages) {
+  const hasGemini = !!(getStoredGeminiKey() || import.meta.env.VITE_GEMINI_API_KEY);
+  const hasDeepSeek = !!(getStoredApiKey() && getStoredApiKey() !== 'eduplan_system_free_key') ||
+    !!(import.meta.env.VITE_DEEPSEEK_API_KEY);
+
+  if (hasGemini) {
+    return await callGeminiAPI(messages);
+  }
+  if (hasDeepSeek) {
+    return await callDeepSeekAPI(messages);
+  }
+  throw new Error('Nenhuma Chave de API configurada. Utilizando o gerador pedagógico nativo gratuito.');
 }
 
 /**
@@ -124,10 +193,10 @@ Retorne APENAS um objeto JSON válido (sem cercas markdown de código \`\`\`json
 - Contexto da Turma / Observações: ${observacoesEspeciais || 'Turma heterogênea necessitando de estímulo ao trabalho colaborativo e foco em metodologias ativas.'}`;
 
   try {
-    const rawResult = await callDeepSeekAPI([
-      { role: 'system', content: promptSystem },
-      { role: 'user', content: promptUser }
-    ], apiKey);
+    const rawResult = await callAI([
+      { role: \'system\', content: promptSystem },
+      { role: \'user\', content: promptUser }
+    ]);
 
     const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
     return JSON.parse(cleanJsonText);
@@ -187,10 +256,10 @@ Retorne APENAS um objeto JSON estruturado com as seguintes chaves:
 - Recursos de Acessibilidade disponíveis na escola: ${recursosAcessibilidade || 'Materiais pedagógicos adaptados, apoio visual e sala de recursos multifuncionais.'}`;
 
   try {
-    const rawResult = await callDeepSeekAPI([
-      { role: 'system', content: promptSystem },
-      { role: 'user', content: promptUser }
-    ], apiKey);
+    const rawResult = await callAI([
+      { role: \'system\', content: promptSystem },
+      { role: \'user\', content: promptUser }
+    ]);
 
     const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
     return JSON.parse(cleanJsonText);
@@ -292,7 +361,7 @@ export async function generateDidacticSequenceWithAI(formData, apiKey = '') {
   try {
     const promptSystem = `Você é um doutor em Didática e Educação Básica. Crie uma Sequência Didática Encadeada completa para a unidade temática "${formData.unidadeTematica}". Retorne um JSON válido com: { "titulo": "", "objetivoGeral": "", "aulasEncadeadas": [ { "aulaNumero": "Aula 1", "temaAula": "", "objetivoEspecifico": "", "desenvolvimento": "", "recursos": "", "avaliacaoFormacao": "" } ], "avaliacaoFinalSequencia": "", "referenciasBibliograficas": "" }`;
     const promptUser = `Gere a sequência didática de ${formData.numeroAulas} para ${formData.disciplina} (${formData.anoSerie}) com foco em ${formData.tipoMetodologia}. Habilidades: ${formData.habilidadesBNCC?.map(h => h.code).join(', ')}`;
-    const rawResult = await callDeepSeekAPI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }], apiKey);
+    const rawResult = await callAI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }]);
     const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
     return JSON.parse(cleanJsonText);
   } catch (e) {
@@ -351,7 +420,7 @@ export async function generatePedagogicalReportWithAI(formData, apiKey = '') {
   try {
     const promptSystem = `Você é um coordenador pedagógico e especialista em Pareceres Descritivos. Crie um Relatório Pedagógico Individual formal, empático e construtivo. Retorne um JSON válido com: { "tituloRelatorio": "", "introducaoContexto": "", "desenvolvimentoCognitivo": "", "desenvolvimentoSocioemocional": "", "pontosFortesDestacados": [], "desafiosECombinados": [], "recomendacoesPedagógicas": "", "consideracoesFinais": "" }`;
     const promptUser = `Gere o relatório de ${formData.nomeAluno} (${formData.anoSerie} - ${formData.disciplina}). Período: ${formData.periodo}. Pontos Fortes: ${formData.pontosFortes}. Desafios: ${formData.desafiosAprendizagem}. Comportamento: ${formData.comportamentoSocioemocional}. Recomendações: ${formData.recomendacoesFamilia}.`;
-    const rawResult = await callDeepSeekAPI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }], apiKey);
+    const rawResult = await callAI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }]);
     const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
     return JSON.parse(cleanJsonText);
   } catch (e) {
@@ -477,8 +546,7 @@ PARÂMETROS DA ADAPTAÇÃO:
 
 Analise CUIDADOSAMENTE cada questão da atividade original, identifique seus tipos e barreiras, e gere a adaptação completa e individualizada para cada questão. Retorne APENAS o JSON, sem texto antes ou depois.`;
 
-    const rawResult = await callDeepSeekAPI(
-      [{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }],
+    const rawResult = await callAI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }],
       apiKey
     );
 
@@ -553,7 +621,7 @@ export async function generateAnnualCoursePlanWithAI(formData, apiKey = '') {
   try {
     const promptSystem = `Você é um doutor em Gestão Curricular e Didática da Educação Básica. Crie um Plano de Curso Anual completo distribuído por Bimestres Letivos. Retorne um JSON válido com a seguinte estrutura: { "tituloPlanoAnual": "", "ementaGeral": "", "objetivosAnuais": [], "distribuicaoBimestral": [ { "bimestre": "1º Bimestre", "unidadeTematica": "", "habilidadesAlvo": [ { "code": "", "descricao": "" } ], "conteudosEssenciais": [], "metodologiaErecursos": "", "avaliacaoPeriodo": "" } ], "referenciasErecursos": "" }`;
     const promptUser = `Gere o plano de curso anual para ${formData.disciplina} (${formData.anoSerie}). Carga horária: ${formData.cargaHoraria}. Divisão: ${formData.divisaoPeriodo}. Foco: ${formData.focoPedagogico || 'Geral'}. Observações: ${formData.observacoes || 'Nenhuma'}.`;
-    const rawResult = await callDeepSeekAPI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }], apiKey);
+    const rawResult = await callAI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }]);
     const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
     return JSON.parse(cleanJsonText);
   } catch (err) {
@@ -640,7 +708,7 @@ export async function generateInterdisciplinaryProjectWithAI(formData, apiKey = 
   try {
     const promptSystem = `Você é um especialista em Projetos Integradores e Aprendizagem Baseada em Projetos (PBL). Crie um Projeto Interdisciplinar completo. Retorne um JSON válido com: { "tituloProjeto": "", "perguntaDisparadora": "", "disciplinasEnvolvidas": [], "produtoFinal": "", "justificativaEDisciplinas": "", "cronogramaEtapas": [ { "etapaNumero": "Etapa 1", "nomeEtapa": "", "descricaoAcoes": "", "responsavelDisciplina": "" } ], "criteriosAvaliacaoConjunta": [], "recursosEParcerias": "" }`;
     const promptUser = `Projeto para ${formData.disciplinaPrincipal} integrada com ${formData.disciplinasSecundarias.join(', ')} (${formData.anoSerie}). Tema: ${formData.temaProjeto}. Duração: ${formData.duracaoProjeto}. Produto Final: ${formData.produtoFinal}. Observações: ${formData.observacoes || 'Nenhuma'}.`;
-    const rawResult = await callDeepSeekAPI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }], apiKey);
+    const rawResult = await callAI([{ role: 'system', content: promptSystem }, { role: 'user', content: promptUser }]);
     const cleanJsonText = rawResult.replace(/```json/gi, '').replace(/```/g, '').trim();
     return JSON.parse(cleanJsonText);
   } catch (err) {
