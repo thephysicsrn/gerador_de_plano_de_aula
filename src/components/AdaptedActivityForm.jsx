@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Accessibility, Sparkles, Upload, FileText, CheckCircle2, ChevronRight, Copy, File, AlertCircle, RefreshCw } from 'lucide-react';
+import { Accessibility, Sparkles, Upload, FileText, CheckCircle2, Copy, File, RefreshCw } from 'lucide-react';
 import { ANOS_SERIES, DISCIPLINAS, NECESSIDADES_PEI } from '../data/bnccData';
 
 export default function AdaptedActivityForm({ onGenerate, isLoading }) {
@@ -11,7 +11,7 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
   // Parâmetros de Adaptação
   const [necessidade, setNecessidade] = useState('Transtorno do Espectro Autista (TEA / Autismo)');
   const [disciplina, setDisciplina] = useState('Língua Portuguesa');
-  const [anoSerie, setAnoSerie] = useState('6º Ano');
+  const [anoSerie, setAnoSerie] = useState('6º Ano (Ensino Fundamental II)');
   const [nivelSimplificacao, setNivelSimplificacao] = useState('Médio (Manter objetivo com suporte visual e frases curtas)');
   const [instrucoesExtras, setInstrucoesExtras] = useState('');
 
@@ -30,7 +30,6 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
     reader.onload = (event) => {
       let content = event.target.result;
 
-      // Se for PDF ou binário com caracteres de controle, limpa os caracteres não imprimíveis
       if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
         content = content
           .replace(/[^\x20-\x7E\xA0-\xFF\n\r\t]/g, ' ')
@@ -47,7 +46,6 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
       setFileLoading(false);
     };
 
-    // Lê como texto plano
     reader.readAsText(file);
   };
 
@@ -88,25 +86,24 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
   };
 
   return (
-    <div className="form-page-container animate-fade-in">
-      <div className="form-card-podia">
-        {/* Cabeçalho do Formulário */}
-        <div className="form-header-podia">
-          <div className="form-badge-pill bg-rose-pill">
-            <Accessibility className="w-4 h-4 mr-1.5 text-rose-600 dark:text-rose-400 shrink-0" />
-            <span>Gerador de Atividades Adaptadas com IA</span>
+    <div className="workspace-split-container animate-fade-in">
+      <div className="form-card main-form-card">
+        {/* Banner de Título Padrão */}
+        <div className="form-card-header">
+          <div className="icon-wrapper bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
+            <Accessibility className="w-6 h-6" />
           </div>
-          <h2 className="form-title-podia">Adaptação Rápida de Atividades & Acessibilidade</h2>
-          <p className="form-subtitle-podia">
-            Transforme qualquer exercício ou texto de prova em uma versão acessível para TEA (Autismo), TDAH, Dislexia ou Baixa Visão instantaneamente.
-          </p>
+          <div>
+            <h2>Adaptação Rápida de Atividades & Acessibilidade</h2>
+            <p>Transforme qualquer exercício ou texto de prova em uma versão acessível para TEA, TDAH, Dislexia ou Baixa Visão</p>
+          </div>
         </div>
 
         {/* Escolha do Modo de Entrada: Copiar & Colar vs Upload */}
-        <div className="auth-tab-buttons mb-6">
+        <div className="flex gap-3 mb-6">
           <button
             type="button"
-            className={`auth-tab-btn ${inputMode === 'text' ? 'active' : ''}`}
+            className={`btn flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${inputMode === 'text' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setInputMode('text')}
           >
             <Copy className="w-4 h-4 mr-2 inline" />
@@ -115,7 +112,7 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
 
           <button
             type="button"
-            className={`auth-tab-btn ${inputMode === 'upload' ? 'active' : ''}`}
+            className={`btn flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${inputMode === 'upload' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setInputMode('upload')}
           >
             <Upload className="w-4 h-4 mr-2 inline" />
@@ -125,14 +122,14 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
 
         {/* MODO 1: COPIAR E COLAR TEXTO */}
         {inputMode === 'text' && (
-          <div className="form-field-group animate-fade-in">
-            <label className="form-label-podia">
+          <div className="form-group col-span-12 animate-fade-in mb-4">
+            <label className="form-label">
               <FileText className="w-4 h-4 text-indigo-500 mr-1.5 inline shrink-0" />
               <span>Cole aqui a Atividade ou Enunciado Original</span>
             </label>
             <textarea
-              className="form-textarea-podia font-mono text-sm"
-              rows="6"
+              className="form-textarea font-mono text-sm"
+              rows={5}
               placeholder="Ex: Questão 1: Leia o texto abaixo e analise as causas da Revolução Industrial na Europa do século XVIII..."
               value={originalText}
               onChange={(e) => setOriginalText(e.target.value)}
@@ -142,14 +139,14 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
 
         {/* MODO 2: UPLOAD DE ARQUIVO */}
         {inputMode === 'upload' && (
-          <div className="form-field-group animate-fade-in">
-            <label className="form-label-podia">
+          <div className="form-group col-span-12 animate-fade-in mb-4">
+            <label className="form-label">
               <Upload className="w-4 h-4 text-emerald-500 mr-1.5 inline shrink-0" />
               <span>Selecione o Arquivo da Atividade (PDF, TXT, DOCX)</span>
             </label>
 
             <div
-              className="file-dropzone-box"
+              className="p-6 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl text-center cursor-pointer hover:border-emerald-500 transition-colors bg-slate-50/50 dark:bg-slate-900/50"
               onClick={() => fileInputRef.current?.click()}
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
@@ -163,32 +160,32 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
               />
 
               {fileLoading ? (
-                <div className="dropzone-loading">
+                <div className="flex flex-col items-center justify-center py-4">
                   <RefreshCw className="w-8 h-8 text-indigo-500 animate-spin mb-2" />
-                  <span>Extraindo texto do arquivo...</span>
+                  <span className="text-sm font-medium">Extraindo texto do arquivo...</span>
                 </div>
               ) : fileName ? (
-                <div className="dropzone-success">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-500 mb-2" />
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{fileName}</span>
-                  <span className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">Texto extraído com sucesso! Clique para alterar o arquivo.</span>
+                <div className="flex flex-col items-center justify-center py-2">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-500 mb-1" />
+                  <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">{fileName}</span>
+                  <span className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">Texto extraído com sucesso! Clique para alterar.</span>
                 </div>
               ) : (
-                <div className="dropzone-prompt">
+                <div className="flex flex-col items-center justify-center py-4">
                   <File className="w-10 h-10 text-slate-400 mb-2" />
-                  <span className="font-bold text-slate-700 dark:text-slate-300">Clique para selecionar ou arraste o arquivo aqui</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-300 text-sm">Clique para selecionar ou arraste o arquivo aqui</span>
                   <span className="text-xs text-slate-500 mt-1">Suporta PDF, TXT, Word (.docx) e arquivos de texto</span>
                 </div>
               )}
             </div>
 
-            {/* Preview do texto lido do arquivo */}
+            {/* Preview do texto lido */}
             {originalText && (
               <div className="mt-3">
                 <label className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1 block">Pré-visualização do texto extraído:</label>
                 <textarea
-                  className="form-textarea-podia font-mono text-xs text-slate-700 dark:text-slate-300"
-                  rows="4"
+                  className="form-textarea font-mono text-xs text-slate-700 dark:text-slate-300"
+                  rows={3}
                   value={originalText}
                   onChange={(e) => setOriginalText(e.target.value)}
                 />
@@ -198,14 +195,14 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
         )}
 
         {/* OPÇÕES DE ADAPTAÇÃO INCLUSIVA */}
-        <div className="form-grid-2 mt-6">
-          <div className="form-field-group">
-            <label className="form-label-podia">
+        <div className="form-grid">
+          <div className="form-group col-span-6">
+            <label className="form-label">
               <Accessibility className="w-4 h-4 text-rose-500 mr-1.5 inline shrink-0" />
               <span>Público-Alvo / Necessidade Específica</span>
             </label>
             <select
-              className="form-select-podia"
+              className="form-select"
               value={necessidade}
               onChange={(e) => setNecessidade(e.target.value)}
             >
@@ -217,12 +214,10 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
             </select>
           </div>
 
-          <div className="form-field-group">
-            <label className="form-label-podia">
-              <span>Série / Ano Escolar</span>
-            </label>
+          <div className="form-group col-span-6">
+            <label className="form-label">Série / Ano Escolar</label>
             <select
-              className="form-select-podia"
+              className="form-select"
               value={anoSerie}
               onChange={(e) => setAnoSerie(e.target.value)}
             >
@@ -232,15 +227,11 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
               })}
             </select>
           </div>
-        </div>
 
-        <div className="form-grid-2 mt-4">
-          <div className="form-field-group">
-            <label className="form-label-podia">
-              <span>Componente Curricular / Disciplina</span>
-            </label>
+          <div className="form-group col-span-6 mt-3">
+            <label className="form-label">Componente Curricular / Disciplina</label>
             <select
-              className="form-select-podia"
+              className="form-select"
               value={disciplina}
               onChange={(e) => setDisciplina(e.target.value)}
             >
@@ -251,12 +242,10 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
             </select>
           </div>
 
-          <div className="form-field-group">
-            <label className="form-label-podia">
-              <span>Nível de Ajuste / Flexibilização</span>
-            </label>
+          <div className="form-group col-span-6 mt-3">
+            <label className="form-label">Nível de Ajuste / Flexibilização</label>
             <select
-              className="form-select-podia"
+              className="form-select"
               value={nivelSimplificacao}
               onChange={(e) => setNivelSimplificacao(e.target.value)}
             >
@@ -265,49 +254,41 @@ export default function AdaptedActivityForm({ onGenerate, isLoading }) {
               <option value="Intenso (Adequação direta com imagem descritiva e enunciado fracionado)">Intenso (Adequação direta com imagem descritiva e enunciado fracionado)</option>
             </select>
           </div>
-        </div>
 
-        <div className="form-field-group mt-4">
-          <label className="form-label-podia">
-            <span>Observações Especiais para a IA (Opcional)</span>
-          </label>
-          <input
-            type="text"
-            className="form-input-podia"
-            placeholder="Ex: Incluir caixa de palavras chave (banco de respostas) para o aluno consultar."
-            value={instrucoesExtras}
-            onChange={(e) => setInstrucoesExtras(e.target.value)}
-          />
+          <div className="form-group col-span-12 mt-3">
+            <label className="form-label">Observações Especiais para a IA (Opcional)</label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Ex: Incluir caixa de palavras chave (banco de respostas) para o aluno consultar."
+              value={instrucoesExtras}
+              onChange={(e) => setInstrucoesExtras(e.target.value)}
+            />
+          </div>
         </div>
 
         {/* CTA DE GERAÇÃO */}
-        <div className="generate-cta-box-podia mt-6">
-          <div className="generate-info">
-            <Sparkles className="w-5 h-5 text-amber-500 shrink-0" />
-            <span> O DeepSeek reescreverá a atividade mantendo o objetivo pedagógico com suporte de acessibilidade.</span>
-          </div>
+        <div className="step-nav-footer mt-6">
+          <div></div>
 
-          <div className="cta-button-row">
-            <div></div>
-
-            <button
-              className="btn-podia-hero-black"
-              onClick={() => handleSubmit(true)}
-              disabled={isLoading || fileLoading}
-            >
-              {isLoading ? (
-                <span className="flex items-center">
-                  <span className="spinner mr-2"></span>
-                  Adaptando Atividade...
-                </span>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2 text-amber-400" />
-                  <span>Gerar Versão Adaptada com IA</span>
-                </>
-              )}
-            </button>
-          </div>
+          <button
+            type="button"
+            className="btn btn-primary btn-sparkle"
+            onClick={() => handleSubmit(true)}
+            disabled={isLoading || fileLoading}
+          >
+            {isLoading ? (
+              <span className="flex items-center">
+                <span className="spinner mr-2"></span>
+                Adaptando Atividade...
+              </span>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 mr-2 text-amber-400" />
+                <span>Gerar Versão Adaptada com IA</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

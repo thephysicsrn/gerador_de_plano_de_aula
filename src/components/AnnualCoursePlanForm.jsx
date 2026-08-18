@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Sparkles, BookOpen, Clock, ChevronRight, CheckCircle2, Layers } from 'lucide-react';
+import { Calendar, Sparkles, BookOpen, Clock, ChevronRight, Layers } from 'lucide-react';
 import { ANOS_SERIES, DISCIPLINAS } from '../data/bnccData';
 
 export default function AnnualCoursePlanForm({ onGenerate, isLoading }) {
@@ -7,7 +7,7 @@ export default function AnnualCoursePlanForm({ onGenerate, isLoading }) {
 
   // Campos do Formulário
   const [disciplina, setDisciplina] = useState('Física');
-  const [anoSerie, setAnoSerie] = useState('1ª Série');
+  const [anoSerie, setAnoSerie] = useState('1º Ano (Ensino Médio)');
   const [cargaHoraria, setCargaHoraria] = useState('80 horas/aula (2 aulas semanais)');
   const [divisaoPeriodo, setDivisaoPeriodo] = useState('4 Bimestres Letivos');
   const [focoPedagogico, setFocoPedagogico] = useState('');
@@ -32,44 +32,53 @@ export default function AnnualCoursePlanForm({ onGenerate, isLoading }) {
   };
 
   return (
-    <div className="form-page-container animate-fade-in">
-      <div className="form-card-podia">
-        {/* Cabeçalho do Formulário */}
-        <div className="form-header-podia">
-          <div className="form-badge-pill bg-blue-pill">
-            <Calendar className="w-4 h-4 mr-1.5 text-blue-600 dark:text-blue-400 shrink-0" />
-            <span>Planejador de Curso Anual & Bimestral IA</span>
+    <div className="workspace-split-container animate-fade-in">
+      <div className="form-card main-form-card">
+        {/* Banner de Título Padrão */}
+        <div className="form-card-header">
+          <div className="icon-wrapper bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
+            <Calendar className="w-6 h-6" />
           </div>
-          <h2 className="form-title-podia">Plano de Curso Anual & Ementa Bimestral</h2>
-          <p className="form-subtitle-podia">
-            Mapeie e distribua todas as unidades temáticas, conteúdos e habilidades da BNCC e Matriz SESI ao longo dos 4 bimestres letivos do ano.
-          </p>
+          <div>
+            <h2>Plano de Curso Anual & Ementa Bimestral</h2>
+            <p>Mapeie e distribua as unidades temáticas, conteúdos e habilidades da BNCC e SESI nos 4 bimestres do ano</p>
+          </div>
         </div>
 
-        {/* Indicador de Passos */}
-        <div className="stepper-bar-podia">
-          <div className={`step-item-podia ${activeStep >= 1 ? 'active' : ''}`}>
-            <div className="step-circle">1</div>
+        {/* Barra de Progresso / Etapas Padrão */}
+        <div className="step-progress-bar">
+          <button
+            type="button"
+            className={`step-tab ${activeStep === 1 ? 'active' : ''}`}
+            onClick={() => setActiveStep(1)}
+          >
+            <span className="step-number">1</span>
             <span className="step-label">Estrutura do Ano</span>
-          </div>
-          <div className="step-line-podia"></div>
-          <div className={`step-item-podia ${activeStep >= 2 ? 'active' : ''}`}>
-            <div className="step-circle">2</div>
+          </button>
+
+          <ChevronRight className="w-4 h-4 text-slate-400 step-arrow" />
+
+          <button
+            type="button"
+            className={`step-tab ${activeStep === 2 ? 'active' : ''}`}
+            onClick={() => setActiveStep(2)}
+          >
+            <span className="step-number">2</span>
             <span className="step-label">Diretrizes & Geração</span>
-          </div>
+          </button>
         </div>
 
         {/* PASSO 1: ESTRUTURA DO ANO */}
         {activeStep === 1 && (
-          <div className="step-content-podia animate-fade-in">
-            <div className="form-grid-2">
-              <div className="form-field-group">
-                <label className="form-label-podia">
+          <div className="form-step-content animate-fade-in">
+            <div className="form-grid">
+              <div className="form-group col-span-6">
+                <label className="form-label">
                   <BookOpen className="w-4 h-4 text-indigo-500 mr-1.5 inline shrink-0" />
                   <span>Componente Curricular / Disciplina</span>
                 </label>
                 <select
-                  className="form-select-podia"
+                  className="form-select"
                   value={disciplina}
                   onChange={(e) => setDisciplina(e.target.value)}
                 >
@@ -80,12 +89,10 @@ export default function AnnualCoursePlanForm({ onGenerate, isLoading }) {
                 </select>
               </div>
 
-              <div className="form-field-group">
-                <label className="form-label-podia">
-                  <span>Série / Ano Escolar</span>
-                </label>
+              <div className="form-group col-span-6">
+                <label className="form-label">Série / Ano Escolar</label>
                 <select
-                  className="form-select-podia"
+                  className="form-select"
                   value={anoSerie}
                   onChange={(e) => setAnoSerie(e.target.value)}
                 >
@@ -95,16 +102,14 @@ export default function AnnualCoursePlanForm({ onGenerate, isLoading }) {
                   })}
                 </select>
               </div>
-            </div>
 
-            <div className="form-grid-2 mt-4">
-              <div className="form-field-group">
-                <label className="form-label-podia">
+              <div className="form-group col-span-6 mt-2">
+                <label className="form-label">
                   <Clock className="w-4 h-4 text-amber-500 mr-1.5 inline shrink-0" />
                   <span>Carga Horária Anual Prevista</span>
                 </label>
                 <select
-                  className="form-select-podia"
+                  className="form-select"
                   value={cargaHoraria}
                   onChange={(e) => setCargaHoraria(e.target.value)}
                 >
@@ -115,13 +120,13 @@ export default function AnnualCoursePlanForm({ onGenerate, isLoading }) {
                 </select>
               </div>
 
-              <div className="form-field-group">
-                <label className="form-label-podia">
+              <div className="form-group col-span-6 mt-2">
+                <label className="form-label">
                   <Layers className="w-4 h-4 text-purple-500 mr-1.5 inline shrink-0" />
                   <span>Divisão dos Períodos Letivos</span>
                 </label>
                 <select
-                  className="form-select-podia"
+                  className="form-select"
                   value={divisaoPeriodo}
                   onChange={(e) => setDivisaoPeriodo(e.target.value)}
                 >
@@ -132,9 +137,9 @@ export default function AnnualCoursePlanForm({ onGenerate, isLoading }) {
               </div>
             </div>
 
-            <div className="step-actions-podia mt-6">
+            <div className="step-nav-footer mt-6">
               <div></div>
-              <button className="btn-podia-black" onClick={handleNextStep}>
+              <button type="button" className="btn btn-primary" onClick={handleNextStep}>
                 <span>Avançar para Diretrizes</span>
                 <ChevronRight className="w-4 h-4 ml-1" />
               </button>
@@ -144,62 +149,52 @@ export default function AnnualCoursePlanForm({ onGenerate, isLoading }) {
 
         {/* PASSO 2: DIRETRIZES E GERAÇÃO */}
         {activeStep === 2 && (
-          <div className="step-content-podia animate-fade-in">
-            <div className="form-field-group">
-              <label className="form-label-podia">
-                <span>Foco Pedagogico ou Unidades Especiais (Opcional)</span>
-              </label>
+          <div className="form-step-content animate-fade-in">
+            <div className="form-group col-span-12">
+              <label className="form-label">Foco Pedagógico ou Unidades Especiais (Opcional)</label>
               <input
                 type="text"
-                className="form-input-podia"
+                className="form-input"
                 placeholder="Ex: Ênfase em Educação Ambiental e Experimentos Práticos / Foco em Resolução de Problemas do ENEM"
                 value={focoPedagogico}
                 onChange={(e) => setFocoPedagogico(e.target.value)}
               />
             </div>
 
-            <div className="form-field-group mt-4">
-              <label className="form-label-podia">
-                <span>Observações para a IA (Opcional)</span>
-              </label>
+            <div className="form-group col-span-12 mt-4">
+              <label className="form-label">Observações para a IA (Opcional)</label>
               <textarea
-                className="form-textarea-podia"
-                rows="3"
+                className="form-textarea"
+                rows={3}
                 placeholder="Ex: Reservar as últimas 2 semanas do 4º Bimestre para revisão e projeto integrador final."
                 value={observacoes}
                 onChange={(e) => setObservacoes(e.target.value)}
               />
             </div>
 
-            <div className="generate-cta-box-podia mt-6">
-              <div className="generate-info">
-                <Sparkles className="w-5 h-5 text-amber-500 shrink-0" />
-                <span>O DeepSeek distribuirá os tópicos curriculares, habilidades da BNCC e avaliações pelos bimestres do ano.</span>
-              </div>
+            <div className="step-nav-footer mt-6">
+              <button type="button" className="btn btn-secondary" onClick={() => setActiveStep(1)}>
+                Voltar
+              </button>
 
-              <div className="cta-button-row">
-                <button className="btn btn-secondary rounded-full" onClick={() => setActiveStep(1)}>
-                  Voltar
-                </button>
-
-                <button
-                  className="btn-podia-hero-black"
-                  onClick={() => handleSubmit(true)}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <span className="flex items-center">
-                      <span className="spinner mr-2"></span>
-                      Gerando Plano Anual...
-                    </span>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2 text-amber-400" />
-                      <span>Gerar Plano de Curso Anual com IA</span>
-                    </>
-                  )}
-                </button>
-              </div>
+              <button
+                type="button"
+                className="btn btn-primary btn-sparkle"
+                onClick={() => handleSubmit(true)}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <span className="flex items-center">
+                    <span className="spinner mr-2"></span>
+                    Gerando Plano Anual...
+                  </span>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2 text-amber-400" />
+                    <span>Gerar Plano de Curso Anual com IA</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         )}

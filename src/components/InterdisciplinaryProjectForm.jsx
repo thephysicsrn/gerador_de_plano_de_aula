@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Network, Sparkles, BookOpen, Clock, ChevronRight, CheckCircle2, Award, Layers } from 'lucide-react';
+import { Network, Sparkles, BookOpen, Clock, ChevronRight, CheckCircle2, Award } from 'lucide-react';
 import { ANOS_SERIES, DISCIPLINAS } from '../data/bnccData';
 
 export default function InterdisciplinaryProjectForm({ onGenerate, isLoading }) {
@@ -8,7 +8,7 @@ export default function InterdisciplinaryProjectForm({ onGenerate, isLoading }) 
   // Campos do Formulário
   const [disciplinaPrincipal, setDisciplinaPrincipal] = useState('Física');
   const [disciplinasSecundarias, setDisciplinasSecundarias] = useState(['Matemática', 'Biologia']);
-  const [anoSerie, setAnoSerie] = useState('1ª Série');
+  const [anoSerie, setAnoSerie] = useState('1º Ano (Ensino Médio)');
   const [temaProjeto, setTemaProjeto] = useState('');
   const [duracaoProjeto, setDuracaoProjeto] = useState('3 Semanas (6 a 12 aulas)');
   const [produtoFinal, setProdutoFinal] = useState('Feira de Ciências & Apresentação de Protótipos');
@@ -50,44 +50,53 @@ export default function InterdisciplinaryProjectForm({ onGenerate, isLoading }) 
   };
 
   return (
-    <div className="form-page-container animate-fade-in">
-      <div className="form-card-podia">
-        {/* Cabeçalho do Formulário */}
-        <div className="form-header-podia">
-          <div className="form-badge-pill bg-emerald-pill">
-            <Network className="w-4 h-4 mr-1.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span>Gerador de Projetos Integradores IA</span>
+    <div className="workspace-split-container animate-fade-in">
+      <div className="form-card main-form-card">
+        {/* Banner de Título Padrão */}
+        <div className="form-card-header">
+          <div className="icon-wrapper bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400">
+            <Network className="w-6 h-6" />
           </div>
-          <h2 className="form-title-podia">Projeto Interdisciplinar & Integrador</h2>
-          <p className="form-subtitle-podia">
-            Conecte 2 ou mais componentes curriculares em uma proposta pedagógica rica com cronograma de etapas, produto final e rubrica de avaliação conjunta.
-          </p>
+          <div>
+            <h2>Projeto Interdisciplinar & Integrador</h2>
+            <p>Conecte 2 ou mais componentes curriculares em uma proposta com cronograma maker, produto final e rubrica de avaliação</p>
+          </div>
         </div>
 
-        {/* Indicador de Passos */}
-        <div className="stepper-bar-podia">
-          <div className={`step-item-podia ${activeStep >= 1 ? 'active' : ''}`}>
-            <div className="step-circle">1</div>
+        {/* Barra de Progresso / Etapas Padrão */}
+        <div className="step-progress-bar">
+          <button
+            type="button"
+            className={`step-tab ${activeStep === 1 ? 'active' : ''}`}
+            onClick={() => setActiveStep(1)}
+          >
+            <span className="step-number">1</span>
             <span className="step-label">Disciplinas & Tema</span>
-          </div>
-          <div className="step-line-podia"></div>
-          <div className={`step-item-podia ${activeStep >= 2 ? 'active' : ''}`}>
-            <div className="step-circle">2</div>
+          </button>
+
+          <ChevronRight className="w-4 h-4 text-slate-400 step-arrow" />
+
+          <button
+            type="button"
+            className={`step-tab ${activeStep === 2 ? 'active' : ''}`}
+            onClick={() => setActiveStep(2)}
+          >
+            <span className="step-number">2</span>
             <span className="step-label">Produto Final & Geração</span>
-          </div>
+          </button>
         </div>
 
         {/* PASSO 1: DISCIPLINAS E TEMA */}
         {activeStep === 1 && (
-          <div className="step-content-podia animate-fade-in">
-            <div className="form-grid-2">
-              <div className="form-field-group">
-                <label className="form-label-podia">
+          <div className="form-step-content animate-fade-in">
+            <div className="form-grid">
+              <div className="form-group col-span-6">
+                <label className="form-label">
                   <BookOpen className="w-4 h-4 text-indigo-500 mr-1.5 inline shrink-0" />
                   <span>Disciplina Principal (Líder)</span>
                 </label>
                 <select
-                  className="form-select-podia"
+                  className="form-select"
                   value={disciplinaPrincipal}
                   onChange={(e) => setDisciplinaPrincipal(e.target.value)}
                 >
@@ -98,12 +107,10 @@ export default function InterdisciplinaryProjectForm({ onGenerate, isLoading }) 
                 </select>
               </div>
 
-              <div className="form-field-group">
-                <label className="form-label-podia">
-                  <span>Série / Ano Escolar</span>
-                </label>
+              <div className="form-group col-span-6">
+                <label className="form-label">Série / Ano Escolar</label>
                 <select
-                  className="form-select-podia"
+                  className="form-select"
                   value={anoSerie}
                   onChange={(e) => setAnoSerie(e.target.value)}
                 >
@@ -113,51 +120,49 @@ export default function InterdisciplinaryProjectForm({ onGenerate, isLoading }) 
                   })}
                 </select>
               </div>
-            </div>
 
-            {/* Seleção de Disciplinas Integradas */}
-            <div className="form-field-group mt-4">
-              <label className="form-label-podia">
-                <Network className="w-4 h-4 text-emerald-500 mr-1.5 inline shrink-0" />
-                <span>Selecione até 3 Disciplinas Integradas (Parceiras)</span>
-              </label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {DISCIPLINAS.map(dObj => typeof dObj === 'object' ? (dObj.name || dObj.label) : dObj)
-                  .filter(name => name !== disciplinaPrincipal)
-                  .map(name => {
-                    const isSelected = disciplinasSecundarias.includes(name);
-                    return (
-                      <button
-                        key={name}
-                        type="button"
-                        className={`btn-tag-select ${isSelected ? 'selected' : ''}`}
-                        onClick={() => toggleSecundaria(name)}
-                      >
-                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 mr-1 inline" />}
-                        <span>{name}</span>
-                      </button>
-                    );
-                  })}
+              {/* Seleção de Disciplinas Integradas */}
+              <div className="form-group col-span-12 mt-3">
+                <label className="form-label">
+                  <Network className="w-4 h-4 text-emerald-500 mr-1.5 inline shrink-0" />
+                  <span>Selecione até 3 Disciplinas Integradas (Parceiras)</span>
+                </label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {DISCIPLINAS.map(dObj => typeof dObj === 'object' ? (dObj.name || dObj.label) : dObj)
+                    .filter(name => name !== disciplinaPrincipal)
+                    .map(name => {
+                      const isSelected = disciplinasSecundarias.includes(name);
+                      return (
+                        <button
+                          key={name}
+                          type="button"
+                          className={`btn-tag-select ${isSelected ? 'selected' : ''}`}
+                          onClick={() => toggleSecundaria(name)}
+                        >
+                          {isSelected && <CheckCircle2 className="w-3.5 h-3.5 mr-1 inline" />}
+                          <span>{name}</span>
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+
+              <div className="form-group col-span-12 mt-3">
+                <label className="form-label">Tema Central ou Pergunta Guiadora do Projeto</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Ex: Como transformar o lixo orgânico da escola em energia limpa? / A Química dos Alimentos e a Saúde"
+                  value={temaProjeto}
+                  onChange={(e) => setTemaProjeto(e.target.value)}
+                  required
+                />
               </div>
             </div>
 
-            <div className="form-field-group mt-4">
-              <label className="form-label-podia">
-                <span>Tema Central ou Pergunta Guiadora do Projeto</span>
-              </label>
-              <input
-                type="text"
-                className="form-input-podia"
-                placeholder="Ex: Como transformar o lixo orgânico da escola em energia limpa? / A Química dos Alimentos e a Saúde"
-                value={temaProjeto}
-                onChange={(e) => setTemaProjeto(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="step-actions-podia mt-6">
+            <div className="step-nav-footer mt-6">
               <div></div>
-              <button className="btn-podia-black" onClick={handleNextStep}>
+              <button type="button" className="btn btn-primary" onClick={handleNextStep}>
                 <span>Avançar para Produto Final</span>
                 <ChevronRight className="w-4 h-4 ml-1" />
               </button>
@@ -167,15 +172,15 @@ export default function InterdisciplinaryProjectForm({ onGenerate, isLoading }) 
 
         {/* PASSO 2: PRODUTO FINAL E GERAÇÃO */}
         {activeStep === 2 && (
-          <div className="step-content-podia animate-fade-in">
-            <div className="form-grid-2">
-              <div className="form-field-group">
-                <label className="form-label-podia">
+          <div className="form-step-content animate-fade-in">
+            <div className="form-grid">
+              <div className="form-group col-span-6">
+                <label className="form-label">
                   <Clock className="w-4 h-4 text-amber-500 mr-1.5 inline shrink-0" />
                   <span>Duração Estimada do Projeto</span>
                 </label>
                 <select
-                  className="form-select-podia"
+                  className="form-select"
                   value={duracaoProjeto}
                   onChange={(e) => setDuracaoProjeto(e.target.value)}
                 >
@@ -186,13 +191,13 @@ export default function InterdisciplinaryProjectForm({ onGenerate, isLoading }) 
                 </select>
               </div>
 
-              <div className="form-field-group">
-                <label className="form-label-podia">
+              <div className="form-group col-span-6">
+                <label className="form-label">
                   <Award className="w-4 h-4 text-purple-500 mr-1.5 inline shrink-0" />
                   <span>Tipo de Produto Final Esperado</span>
                 </label>
                 <select
-                  className="form-select-podia"
+                  className="form-select"
                   value={produtoFinal}
                   onChange={(e) => setProdutoFinal(e.target.value)}
                 >
@@ -200,53 +205,45 @@ export default function InterdisciplinaryProjectForm({ onGenerate, isLoading }) 
                   <option value="Podcast / Infográfico Digital / E-book Didático">Podcast / Infográfico Digital / E-book Didático</option>
                   <option value="Maquete Física Interativa ou Modelo 3D">Maquete Física Interativa ou Modelo 3D</option>
                   <option value="Revista em Quadrinhos (HQ) ou Jornal Escolar">Revista em Quadrinhos (HQ) ou Jornal Escolar</option>
-                  <option value="Vídeo Documentário ou Apresentação de Teatral">Vídeo Documentário ou Apresentação Teatral</option>
+                  <option value="Vídeo Documentário ou Apresentação Teatral">Vídeo Documentário ou Apresentação Teatral</option>
                 </select>
               </div>
+
+              <div className="form-group col-span-12 mt-3">
+                <label className="form-label">Instruções ou Requisitos Adicionais (Opcional)</label>
+                <textarea
+                  className="form-textarea"
+                  rows={3}
+                  placeholder="Ex: Incluir uma tabela com a divisão de tarefas por papel em cada equipe (Líder, Pesquisador, Designer, Relator)."
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                />
+              </div>
             </div>
 
-            <div className="form-field-group mt-4">
-              <label className="form-label-podia">
-                <span>Instruções ou Requisitos Adicionais (Opcional)</span>
-              </label>
-              <textarea
-                className="form-textarea-podia"
-                rows="3"
-                placeholder="Ex: Incluir uma tabela com a divisão de tarefas por papel em cada equipe (Líder, Pesquisador, Designer, Relator)."
-                value={observacoes}
-                onChange={(e) => setObservacoes(e.target.value)}
-              />
-            </div>
+            <div className="step-nav-footer mt-6">
+              <button type="button" className="btn btn-secondary" onClick={() => setActiveStep(1)}>
+                Voltar
+              </button>
 
-            <div className="generate-cta-box-podia mt-6">
-              <div className="generate-info">
-                <Sparkles className="w-5 h-5 text-amber-500 shrink-0" />
-                <span>O DeepSeek criará a proposta integradora conectando os objetivos de {disciplinaPrincipal} com {disciplinasSecundarias.join(', ')}.</span>
-              </div>
-
-              <div className="cta-button-row">
-                <button className="btn btn-secondary rounded-full" onClick={() => setActiveStep(1)}>
-                  Voltar
-                </button>
-
-                <button
-                  className="btn-podia-hero-black"
-                  onClick={() => handleSubmit(true)}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <span className="flex items-center">
-                      <span className="spinner mr-2"></span>
-                      Estruturando Projeto...
-                    </span>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2 text-amber-400" />
-                      <span>Gerar Projeto Interdisciplinar com IA</span>
-                    </>
-                  )}
-                </button>
-              </div>
+              <button
+                type="button"
+                className="btn btn-primary btn-sparkle"
+                onClick={() => handleSubmit(true)}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <span className="flex items-center">
+                    <span className="spinner mr-2"></span>
+                    Estruturando Projeto...
+                  </span>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2 text-amber-400" />
+                    <span>Gerar Projeto Interdisciplinar com IA</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         )}
