@@ -6,7 +6,10 @@ import {
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut, 
-  updateProfile
+  updateProfile,
+  GoogleAuthProvider,
+  OAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 
 // Configuração Padrão do Firebase (Projeto Oficial Exclusivo: eduplan-app-2026)
@@ -237,6 +240,54 @@ export async function signInUser(email, password, redeEnsino = 'REDE_SESI') {
       .catch(() => {});
 
     return quickUserData;
+  }
+}
+
+/**
+ * Autenticação Social com Google
+ */
+export async function signInWithGoogle(redeEnsino = 'REDE_SESI') {
+  const provider = new GoogleAuthProvider();
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName || user.email.split('@')[0],
+      photoURL: user.photoURL,
+      redeEnsino: redeEnsino || 'REDE_SESI',
+      isDemo: false
+    };
+    setStoredSessionUser(userData);
+    return userData;
+  } catch (error) {
+    console.error('Erro no login com Google:', error);
+    throw new Error('Não foi possível entrar com o Google: ' + (error.message || 'tente novamente.'));
+  }
+}
+
+/**
+ * Autenticação Social com Microsoft (Outlook / Office 365 / Entra ID)
+ */
+export async function signInWithMicrosoft(redeEnsino = 'REDE_SESI') {
+  const provider = new OAuthProvider('microsoft.com');
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName || user.email.split('@')[0],
+      photoURL: user.photoURL,
+      redeEnsino: redeEnsino || 'REDE_SESI',
+      isDemo: false
+    };
+    setStoredSessionUser(userData);
+    return userData;
+  } catch (error) {
+    console.error('Erro no login com Microsoft:', error);
+    throw new Error('Não foi possível entrar com a Microsoft: ' + (error.message || 'verifique as chaves no Firebase.'));
   }
 }
 
