@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, FileText, HeartHandshake, ArrowRight, Layers, UserCheck, Calendar, Network } from 'lucide-react';
+import { Sparkles, FileText, HeartHandshake, ArrowRight, Layers, UserCheck, Calendar, Network, Database } from 'lucide-react';
 
 export default function HeroSection({ onSelectTab }) {
   return (
