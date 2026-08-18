@@ -120,13 +120,47 @@ export async function signUpUser(email, password, displayName = '', redeEnsino =
     };
 
     saveLocalAccount({ ...newUserData, password: cleanPass });
+    saveLocalAccount({ ...newUserData, password: cleanPass, syncedToFirebase: false });
     setStoredSessionUser(newUserData);
     return newUserData;
   }
 }
 
 /**
- * Entrar na Conta (Sign In com Email/Senha)
+ * Sincronizar automaticamente todas as contas locais salvas no navegador para o Firebase Authentication
+ */
+export async function syncLocalAccountsToFirebase() {
+  const accounts = getLocalAccounts();
+  if (!accounts || accounts.length === 0) return;
+
+  for (const acc of accounts) {
+    if (!acc.syncedToFirebase && acc.email && acc.password && acc.password.length >= 6) {
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, acc.email.trim().toLowerCase(), acc.password.trim());
+        if (acc.displayName && userCred.user) {
+          await updateProfile(userCred.user, { displayName: acc.displayName });
+        }
+        acc.syncedToFirebase = true;
+        saveLocalAccount(acc);
+      } catch (err) {
+        if (err.code === 'auth/email-already-in-use') {
+          acc.syncedToFirebase = true;
+          saveLocalAccount(acc);
+        }
+      }
+    }
+  }
+}
+
+// Inicia sincronização de fundo ao carregar o aplicativo
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    syncLocalAccountsToFirebase().catch(() => {});
+  }, 1000);
+}
+
+/**
+ * Entrar na Conta (Sign In com Email/Senha + Auto-Sincronização no Firebase)
  */
 export async function signInUser(email, password, redeEnsino = 'REDE_SESI') {
   const cleanEmail = email.trim().toLowerCase();
@@ -147,7 +181,7 @@ export async function signInUser(email, password, redeEnsino = 'REDE_SESI') {
   } catch (error) {
     console.warn('Firebase Auth Fallback para login local:', error.message);
 
-    // Verifica na base de contas locais
+    // Tenta criar a conta no Firebase se ela existia apenas localmente
     const accounts = getLocalAccounts();
     const found = accounts.find(a => a.email.toLowerCase() === cleanEmail);
 
@@ -155,6 +189,19 @@ export async function signInUser(email, password, redeEnsino = 'REDE_SESI') {
       if (found.password && found.password !== cleanPass) {
         throw new Error('Senha incorreta para este e-mail.');
       }
+
+      // Tenta migrar/subir para o Firebase Authentication em background
+      try {
+        const newUserCred = await createUserWithEmailAndPassword(auth, cleanEmail, cleanPass);
+        if (found.displayName && newUserCred.user) {
+          await updateProfile(newUserCred.user, { displayName: found.displayName });
+        }
+        found.syncedToFirebase = true;
+        saveLocalAccount(found);
+      } catch (syncErr) {
+        // Se já existia ou falhou, continua
+      }
+
       const userData = {
         uid: found.uid,
         email: found.email,
@@ -179,8 +226,16 @@ export async function signInUser(email, password, redeEnsino = 'REDE_SESI') {
       redeEnsino: redeEnsino || 'REDE_SESI',
       isDemo: false
     };
-    saveLocalAccount({ ...quickUserData, password: cleanPass });
+    saveLocalAccount({ ...quickUserData, password: cleanPass, syncedToFirebase: false });
     setStoredSessionUser(quickUserData);
+
+    // Tenta registrar no Firebase
+    createUserWithEmailAndPassword(auth, cleanEmail, cleanPass)
+      .then(userCred => {
+        if (userCred.user) updateProfile(userCred.user, { displayName: quickUserData.displayName });
+      })
+      .catch(() => {});
+
     return quickUserData;
   }
 }
