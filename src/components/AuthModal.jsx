@@ -191,20 +191,17 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
             )}
           </button>
 
-          <div className="relative my-4 flex items-center justify-center">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
-            </div>
-            <span className="relative bg-white dark:bg-slate-900 px-3 text-xs text-slate-400 font-medium uppercase">ou acesse com</span>
+          <div className="auth-divider">
+            <span>ou acesse com</span>
           </div>
 
           <button
             type="button"
-            className="w-full btn btn-secondary flex items-center justify-center gap-2.5 py-3 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer shadow-sm"
+            className="auth-google-btn"
             onClick={handleGoogleAuth}
             disabled={isLoading}
           >
-            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+            <svg className="auth-google-icon" viewBox="0 0 24 24" width="18" height="18">
               <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.3 8.9 5 12 5z"/>
               <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
               <path fill="#FBBC05" d="M5.3 14.8c-.3-.8-.4-1.8-.4-2.8s.1-2 .4-2.8L1.6 6.3C.6 8.3 0 10.6 0 13s.6 4.7 1.6 6.7l3.7-2.9z"/>
